@@ -1,0 +1,46 @@
+<!--pages/admin/guests/guests.wxml-->
+<view class="guests-page">
+  <view class="toolbar">
+    <view class="summary">共 {{guests.length}} 人 · 预计 {{totalCount}} 位出席</view>
+    <button class="add-btn" size="mini" bindtap="openAdd">添加</button>
+  </view>
+
+  <view class="empty" wx:if="{{guests.length === 0}}">暂无宾客，点击右上角添加</view>
+
+  <view class="guest-item" wx:for="{{guests}}" wx:key="id">
+    <view class="guest-main">
+      <view class="guest-name">{{item.name}}</view>
+      <view class="guest-meta">{{item.count}} 人 · {{statusText[item.status] || item.status}}</view>
+      <view class="guest-msg" wx:if="{{item.message}}">{{item.message}}</view>
+    </view>
+    <view class="guest-actions">
+      <text class="action" data-id="{{item.id}}" bindtap="openEdit">编辑</text>
+      <text class="action danger" data-id="{{item.id}}" bindtap="removeGuest">删除</text>
+    </view>
+  </view>
+
+  <!-- 编辑弹层 -->
+  <view class="mask" wx:if="{{showForm}}" bindtap="closeForm"></view>
+  <view class="sheet" wx:if="{{showForm}}">
+    <view class="sheet-title">{{editingId ? '编辑宾客' : '添加宾客'}}</view>
+    <view class="form-group">
+      <view class="label">姓名</view>
+      <input class="input" value="{{form.name}}" data-field="name" bindinput="onFormInput" />
+    </view>
+    <view class="form-group">
+      <view class="label">人数</view>
+      <input class="input" type="number" value="{{form.count}}" data-field="count" bindinput="onFormInput" />
+    </view>
+    <view class="form-group">
+      <view class="label">状态</view>
+      <picker mode="selector" range="{{statusOptions}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange">
+        <view class="picker">{{statusOptions[statusIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="form-group">
+      <view class="label">备注</view>
+      <input class="input" value="{{form.message}}" data-field="message" bindinput="onFormInput" />
+    </view>
+    <button class="save-btn" bindtap="saveGuest">保存</button>
+  </view>
+</view>

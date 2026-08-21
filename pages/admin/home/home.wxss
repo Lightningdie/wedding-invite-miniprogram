@@ -1,0 +1,106 @@
+.admin-page {
+  min-height: 100vh;
+  padding: 40rpx 30rpx 80rpx;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #FFF5F0 0%, #FFF8F0 40%, #F7F0E8 100%);
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #8B7355 0%, #C4A030 100%);
+  border-radius: 24rpx;
+  padding: 48rpx 36rpx;
+  color: #fff;
+  margin-bottom: 32rpx;
+}
+
+.hero-label {
+  font-size: 22rpx;
+  opacity: 0.85;
+  letter-spacing: 2rpx;
+  margin-bottom: 16rpx;
+}
+
+.hero-names {
+  font-family: Georgia, serif;
+  font-size: 44rpx;
+  margin-bottom: 12rpx;
+  letter-spacing: 2rpx;
+}
+
+.hero-meta,
+.hero-venue {
+  font-size: 24rpx;
+  opacity: 0.9;
+  margin-top: 6rpx;
+}
+
+.stat-row {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.stat-card {
+  flex: 1;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx 12rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 16rpx rgba(139, 115, 85, 0.06);
+}
+
+.stat-num {
+  font-size: 40rpx;
+  color: #C4A030;
+  font-weight: bold;
+  font-family: Georgia, serif;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: #B8A89A;
+  margin-top: 8rpx;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.menu-item {
+  position: relative;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx 36rpx;
+  box-shadow: 0 4rpx 16rpx rgba(139, 115, 85, 0.06);
+}
+
+.menu-title {
+  font-size: 30rpx;
+  color: #8B7355;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.menu-desc {
+  font-size: 22rpx;
+  color: #B8A89A;
+}
+
+.menu-arrow {
+  position: absolute;
+  right: 32rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 40rpx;
+  color: #D4AF37;
+}
+
+.tip {
+  margin-top: 40rpx;
+  font-size: 22rpx;
+  color: #B8A89A;
+  line-height: 1.6;
+  text-align: center;
+}

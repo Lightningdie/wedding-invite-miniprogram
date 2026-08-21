@@ -1,0 +1,52 @@
+/* 全局样式 · 欧式复古 */
+page {
+  background-color: #FAF5EC;
+  font-family: Georgia, 'Times New Roman', 'Songti SC', 'PingFang SC', serif;
+  color: #5C4030;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+.container {
+  padding: 0 30rpx;
+}
+
+.section-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 52rpx;
+  color: #5C4030;
+  text-align: left;
+  margin-bottom: 12rpx;
+  letter-spacing: 6rpx;
+  font-weight: 400;
+}
+
+.section-subtitle {
+  font-size: 22rpx;
+  color: #A67C52;
+  text-align: left;
+  margin-bottom: 40rpx;
+  letter-spacing: 4rpx;
+  font-style: italic;
+}
+
+.divider {
+  width: 100rpx;
+  height: 1rpx;
+  background: linear-gradient(90deg, #C4A06A, transparent);
+  margin: 0 0 40rpx;
+}
+
+.gold-text {
+  color: #C4A06A;
+}
+
+.pink-bg {
+  background-color: #FAF5EC;
+}

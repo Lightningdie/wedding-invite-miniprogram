@@ -1,0 +1,203 @@
+<!--pages/index/index.wxml-->
+<view class="invite">
+
+  <view class="music-btn {{musicOn ? 'music-on' : ''}}" bindtap="onToggleMusic" bindlongpress="goAdmin">
+    <image class="music-icon" src="/assets/images/music-note.png"></image>
+    <view class="music-slash" wx:if="{{!musicOn}}"></view>
+  </view>
+
+  <!-- ========== 封面 ========== -->
+  <view class="sec hero-sheet {{revealed.hero ? 'reveal' : ''}}" id="sec-hero">
+    <image class="hero-bg" src="{{wedding.coverImage}}" mode="aspectFill"></image>
+    <view class="hero-topshade"></view>
+    <view class="hero-bottomfade"></view>
+    <view class="hero-content">
+      <view class="hero-script enter enter-down d1">{{wedding.heroLatin}}</view>
+    </view>
+    <view class="hero-landing">
+      <view class="hero-names enter enter-up d3">{{wedding.groom}}<text class="hero-amp"> & </text>{{wedding.bride}}</view>
+      <view class="hero-date enter enter-up d4">{{wedding.solarDate}} · {{wedding.weekDay}} · 农历{{wedding.lunarDate}}</view>
+    </view>
+    <view class="scroll-hint">向下滑动 · 开启请柬</view>
+  </view>
+
+  <!-- ========== 邀请 ========== -->
+  <view class="sec invitation-sheet parchment {{revealed.invitation ? 'reveal' : ''}}" id="sec-invitation">
+    <view class="invite-headline enter enter-down d1">{{wedding.inviteHeadline}}</view>
+    <view class="invite-photo-wrap enter enter-up d2">
+      <image class="invite-photo" src="{{wedding.inviteImage}}" mode="aspectFill"></image>
+      <view class="invite-photo-fade"></view>
+    </view>
+    <view class="invite-body">
+      <view
+        class="invitation-text enter enter-up d{{index + 3}}"
+        wx:for="{{wedding.inviteLines}}"
+        wx:for-item="line"
+        wx:key="*this"
+      >
+        <text>{{line}}</text>
+      </view>
+    </view>
+    <view class="invite-filler enter enter-up d9">
+      <view class="filler-line" wx:for="{{wedding.inviteFiller}}" wx:key="*this">
+        <text>{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 婚礼信息 ========== -->
+  <view class="sec info-sheet parchment {{revealed.info ? 'reveal' : ''}}" id="sec-info">
+    <view class="corner corner-tl"></view>
+    <view class="corner corner-br"></view>
+    <view class="latin-tag enter enter-down d1">Details</view>
+    <view class="section-title enter enter-left d2">婚礼信息</view>
+    <view class="ornament enter enter-right d3">✦</view>
+    <view class="info-stack">
+      <view class="info-block enter enter-left d4">
+        <view class="info-label">Date</view>
+        <view class="info-big">{{wedding.solarDate}}</view>
+        <view class="info-sub">{{wedding.weekDay}} · 农历{{wedding.lunarDate}}</view>
+      </view>
+      <view class="info-block shift-right enter enter-right d5">
+        <view class="info-label">Ceremony</view>
+        <view class="info-big time-big">{{wedding.ceremonyTime}}</view>
+        <view class="info-sub">典礼开始 · 请提前到场</view>
+      </view>
+      <view class="info-block enter enter-up d6">
+        <view class="info-label">Venue</view>
+        <view class="info-venue">{{wedding.venueName}}</view>
+        <view class="info-sub">{{wedding.venueHall}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 甜蜜相册 ========== -->
+  <view class="sec photos-sheet parchment {{revealed.photos ? 'reveal' : ''}}" id="sec-photos">
+    <view class="latin-tag enter enter-down d1">Gallery</view>
+    <view class="section-title enter enter-down d2">甜蜜相册</view>
+    <view class="ornament enter enter-up d3">❦</view>
+    <view class="photo-masonry">
+      <view
+        class="photo-frame enter {{index % 2 === 0 ? 'enter-left tilt-left' : 'enter-right tilt-right'}} d{{index + 3}}"
+        wx:for="{{wedding.photos}}"
+        wx:key="title"
+      >
+        <image class="photo-img" src="{{item.src}}" mode="aspectFill"></image>
+        <view class="photo-meta">
+          <text class="photo-title">{{item.title}}</text>
+          <text class="photo-desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 我们的故事 ========== -->
+  <view class="sec story-sheet parchment {{revealed.story ? 'reveal' : ''}}" id="sec-story">
+    <view class="latin-tag enter enter-down d1">Our Story</view>
+    <view class="section-title enter enter-right d2">我们的故事</view>
+    <view class="ornament enter enter-left d3">❧</view>
+    <view class="story-list">
+      <view
+        class="story-chapter-block enter {{index % 2 === 0 ? 'enter-left' : 'enter-right'}} d{{index + 3}}"
+        wx:for="{{wedding.stories}}"
+        wx:key="title"
+      >
+        <view class="story-num">{{item.chapter}}</view>
+        <view class="story-title">{{item.title}}</view>
+        <view class="story-rule"></view>
+        <view class="story-content">{{item.content}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 婚礼流程 ========== -->
+  <view class="sec timeline-sheet parchment {{revealed.timeline ? 'reveal' : ''}}" id="sec-timeline">
+    <view class="tl-head enter enter-down d1">
+      <view class="tl-script">Wedding time</view>
+      <view class="tl-date">{{wedding.dateLong}}</view>
+      <view class="tl-lunar">农历：{{wedding.lunarDate}} · {{wedding.weekDay}}</view>
+    </view>
+    <view class="tl-list">
+      <view
+        class="tl-row enter enter-up d{{index + 3}}"
+        wx:for="{{wedding.timeline}}"
+        wx:key="time"
+      >
+        <view class="tl-left">{{item.en}}</view>
+        <view class="tl-line"></view>
+        <view class="tl-right">
+          <view class="tl-time">{{item.time}}</view>
+          <view class="tl-title">{{item.title}}</view>
+          <view class="tl-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 地点导航 ========== -->
+  <view class="sec map-sheet parchment {{revealed.map ? 'reveal' : ''}}" id="sec-map">
+    <view class="tl-script enter enter-down d1">Wedding address</view>
+    <view class="map-venue enter enter-right d2">
+      <view class="venue-name">{{wedding.venueName}}</view>
+      <view class="venue-hall">{{wedding.venueHall}}</view>
+      <view class="venue-address">{{wedding.venueAddress}}</view>
+    </view>
+    <map
+      class="venue-map enter enter-up d4"
+      latitude="{{wedding.latitude}}"
+      longitude="{{wedding.longitude}}"
+      scale="16"
+      show-location="{{true}}"
+      markers="{{mapMarkers}}"
+      enable-scroll="{{false}}"
+      enable-zoom="{{false}}"
+    ></map>
+    <button class="nav-btn enter enter-up d5" bindtap="navigateToVenue">开启导航</button>
+    <view class="tip-list enter enter-down d6">
+      <view class="tip-item" wx:for="{{wedding.transportTips}}" wx:key="text">
+        <text>{{item.text}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 祝福留言 ========== -->
+  <view class="sec rsvp-sheet parchment {{revealed.rsvp ? 'reveal' : ''}}" id="sec-rsvp">
+    <view class="latin-tag enter enter-down d1">Blessings</view>
+    <view class="section-title enter enter-down d2">祝福留言</view>
+    <view class="ornament enter enter-up d3">❦</view>
+
+    <view class="rsvp-form enter enter-left d4">
+      <view class="form-item">
+        <input class="form-input" placeholder="您的姓名" value="{{formData.name}}" bindinput="onNameInput" />
+      </view>
+      <view class="form-item">
+        <input class="form-input" placeholder="出席人数" type="number" value="{{formData.count}}" bindinput="onCountInput" />
+      </view>
+      <view class="form-item">
+        <textarea class="form-textarea" placeholder="写下您的祝福..." value="{{formData.message}}" bindinput="onMessageInput"></textarea>
+      </view>
+      <button class="submit-btn" bindtap="submitBlessing">送出祝福</button>
+      <view class="persist-tip" wx:if="{{cloudTip}}">{{cloudTip}}</view>
+    </view>
+
+    <view class="blessing-wall enter enter-right d5" wx:if="{{blessings.length > 0}}">
+      <view class="wall-title">Guest Book</view>
+      <view class="blessing-item" wx:for="{{blessings}}" wx:key="id">
+        <view class="blessing-header">
+          <text class="blessing-name">{{item.name}}</text>
+          <text class="blessing-time">{{item.time}}</text>
+        </view>
+        <view class="blessing-content">{{item.message}}</view>
+      </view>
+    </view>
+
+    <view class="footer-mini enter enter-up d6">
+      <view class="footer-rule"></view>
+      <view class="footer-closing">{{wedding.closing}}</view>
+      <view class="footer-names">{{wedding.groom}} & {{wedding.bride}}</view>
+      <view class="footer-date">{{wedding.solarDate}}</view>
+      <view class="footer-text">With Love</view>
+    </view>
+  </view>
+
+</view>

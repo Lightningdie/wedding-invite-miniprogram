@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/admin/home/home",
+    "pages/admin/edit/edit",
+    "pages/admin/guests/guests"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFF8F0",
+    "navigationBarTitleText": "婚礼邀请函",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFF8F0"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于婚礼场地导航定位"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ],
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

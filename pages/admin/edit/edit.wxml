@@ -1,0 +1,61 @@
+<!--pages/admin/edit/edit.wxml-->
+<view class="edit-page">
+  <view class="form-group">
+    <view class="label">新郎</view>
+    <input class="input" value="{{form.groom}}" data-field="groom" bindinput="onInput" />
+  </view>
+  <view class="form-group">
+    <view class="label">新娘</view>
+    <input class="input" value="{{form.bride}}" data-field="bride" bindinput="onInput" />
+  </view>
+  <view class="form-group">
+    <view class="label">阳历日期</view>
+    <input class="input" value="{{form.solarDate}}" data-field="solarDate" bindinput="onInput" placeholder="如 2026.9.29" />
+  </view>
+  <view class="form-group">
+    <view class="label">农历</view>
+    <input class="input" value="{{form.lunarDate}}" data-field="lunarDate" bindinput="onInput" />
+  </view>
+  <view class="form-group">
+    <view class="label">星期</view>
+    <input class="input" value="{{form.weekDay}}" data-field="weekDay" bindinput="onInput" />
+  </view>
+  <view class="form-group">
+    <view class="label">典礼时间</view>
+    <input class="input" value="{{form.ceremonyTime}}" data-field="ceremonyTime" bindinput="onInput" placeholder="如 8:30" />
+  </view>
+  <view class="form-group">
+    <view class="label">倒计时目标（完整时间）</view>
+    <input class="input" value="{{form.weddingDate}}" data-field="weddingDate" bindinput="onInput" placeholder="2026-09-29 08:30:00" />
+  </view>
+  <view class="form-group">
+    <view class="label">场地名称</view>
+    <input class="input" value="{{form.venueName}}" data-field="venueName" bindinput="onInput" />
+  </view>
+  <view class="form-group">
+    <view class="label">宴会厅</view>
+    <input class="input" value="{{form.venueHall}}" data-field="venueHall" bindinput="onInput" />
+  </view>
+  <view class="form-group">
+    <view class="label">详细地址</view>
+    <input class="input" value="{{form.venueAddress}}" data-field="venueAddress" bindinput="onInput" />
+  </view>
+
+  <view class="loc-box">
+    <view class="label">地图坐标</view>
+    <view class="loc-row">
+      <input class="input half" value="{{form.latitude}}" data-field="latitude" bindinput="onInput" placeholder="纬度" />
+      <input class="input half" value="{{form.longitude}}" data-field="longitude" bindinput="onInput" placeholder="经度" />
+    </view>
+    <button class="loc-btn" bindtap="pickLocation">从地图选点</button>
+  </view>
+
+  <view class="form-group">
+    <view class="label">背景音乐路径</view>
+    <input class="input" value="{{form.musicSrc}}" data-field="musicSrc" bindinput="onInput" />
+    <view class="hint">将 mp3 放到 assets/music/bgm.mp3 后保存即可</view>
+  </view>
+
+  <button class="save-btn" bindtap="saveForm">保存修改</button>
+  <button class="reset-btn" bindtap="resetForm">恢复默认</button>
+</view>

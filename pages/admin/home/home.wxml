@@ -1,0 +1,47 @@
+<!--pages/admin/home/home.wxml-->
+<view class="admin-page">
+  <view class="hero-card">
+    <view class="hero-label">婚礼邀请函后台</view>
+    <view class="hero-names">{{wedding.groom}} & {{wedding.bride}}</view>
+    <view class="hero-meta">{{wedding.solarDate}} · {{wedding.ceremonyTime}}</view>
+    <view class="hero-venue">{{wedding.venueName}} · {{wedding.venueHall}}</view>
+  </view>
+
+  <view class="stat-row">
+    <view class="stat-card">
+      <view class="stat-num">{{guestCount}}</view>
+      <view class="stat-label">宾客名单</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-num">{{guestTotal}}</view>
+      <view class="stat-label">预计出席</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-num">{{blessingCount}}</view>
+      <view class="stat-label">祝福留言</view>
+    </view>
+  </view>
+
+  <view class="menu-list">
+    <view class="menu-item" bindtap="goInvite">
+      <view class="menu-title">查看邀请函</view>
+      <view class="menu-desc">预览宾客端翻书邀请页</view>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goEdit">
+      <view class="menu-title">编辑信息</view>
+      <view class="menu-desc">修改新人、日期、场地与坐标</view>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goGuests">
+      <view class="menu-title">名单管理</view>
+      <view class="menu-desc">添加、编辑、删除宾客名单</view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="tip">
+    祝福与名单会写入本地持久化；开通云开发并创建集合后，将同步保存到云数据库，换设备也可查看。
+    当前：{{cloudReady ? '云数据库已连接' : '本地持久化（未连接云）'}}
+  </view>
+</view>

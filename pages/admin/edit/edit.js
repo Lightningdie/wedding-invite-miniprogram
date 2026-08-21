@@ -1,0 +1,97 @@
+const storage = require('../../../utils/storage.js')
+
+Page({
+  data: {
+    form: {}
+  },
+
+  onLoad() {
+    this.loadForm()
+  },
+
+  async loadForm() {
+    const wedding = await storage.loadWeddingAsync()
+    this.setData({
+      form: {
+        groom: wedding.groom,
+        bride: wedding.bride,
+        solarDate: wedding.solarDate,
+        lunarDate: wedding.lunarDate,
+        weekDay: wedding.weekDay,
+        ceremonyTime: wedding.ceremonyTime,
+        weddingDate: wedding.weddingDate,
+        venueName: wedding.venueName,
+        venueHall: wedding.venueHall,
+        venueAddress: wedding.venueAddress,
+        latitude: String(wedding.latitude),
+        longitude: String(wedding.longitude),
+        musicSrc: wedding.musicSrc
+      }
+    })
+  },
+
+  onInput(e) {
+    const field = e.currentTarget.dataset.field
+    this.setData({
+      ['form.' + field]: e.detail.value
+    })
+  },
+
+  pickLocation() {
+    wx.chooseLocation({
+      success: (res) => {
+        const patch = {
+          'form.latitude': String(res.latitude),
+          'form.longitude': String(res.longitude)
+        }
+        if (res.address) {
+          patch['form.venueAddress'] = res.address
+        }
+        if (res.name) {
+          patch['form.venueName'] = res.name
+        }
+        this.setData(patch)
+      },
+      fail: () => {
+        wx.showToast({ title: '请授权位置后重试', icon: 'none' })
+      }
+    })
+  },
+
+  async saveForm() {
+    const form = this.data.form
+    storage.setWedding({
+      groom: form.groom,
+      bride: form.bride,
+      solarDate: form.solarDate,
+      lunarDate: form.lunarDate,
+      weekDay: form.weekDay,
+      ceremonyTime: form.ceremonyTime,
+      weddingDate: form.weddingDate,
+      venueName: form.venueName,
+      venueHall: form.venueHall,
+      venueAddress: form.venueAddress,
+      latitude: Number(form.latitude),
+      longitude: Number(form.longitude),
+      musicSrc: form.musicSrc
+    })
+    wx.showToast({
+      title: storage.isCloudReady() ? '已同步云端' : '已持久保存到本地',
+      icon: 'success'
+    })
+  },
+
+  resetForm() {
+    wx.showModal({
+      title: '确认恢复默认？',
+      success: (res) => {
+        if (!res.confirm) {
+          return
+        }
+        wx.removeStorageSync('wedding_config')
+        this.loadForm()
+        wx.showToast({ title: '已恢复默认', icon: 'none' })
+      }
+    })
+  }
+})
