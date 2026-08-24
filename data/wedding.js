@@ -26,7 +26,7 @@ const DEFAULT_WEDDING = {
     '致我们最亲爱的家人与朋友：',
     '相遇，是命运最温柔的安排；',
     '相守，是余生最郑重的承诺。',
-    '我们决定，携手走过往后的每一个清晨与黄昏。',
+    '我们决定，携手走过余生的清晨与黄昏。',
     '谨定于佳期，诚挚邀请您莅临，',
     '与我们共同见证这一刻的喜悦。'
   ],
@@ -36,10 +36,10 @@ const DEFAULT_WEDDING = {
     'Supporting us and sharing our love.'
   ],
   timeline: [
-    { time: '08:00', en: 'Guest Arrival', title: '迎宾签到', desc: '欢迎各位来宾莅临，签到留影' },
-    { time: '08:30', en: 'Ceremony', title: '婚礼典礼', desc: '新人入场，交换戒指，庄严宣誓' },
-    { time: '09:30', en: 'Banquet', title: '喜宴开席', desc: '美酒佳肴，共庆美好时刻' },
-    { time: '11:00', en: 'Photos', title: '合影留念', desc: '与新人合影，记录美好瞬间' }
+    { time: '08:00', en: 'Guest Arrival', icon: '/assets/images/icons/icon-arrival.png', title: '迎宾签到', desc: '欢迎各位来宾莅临，签到留影' },
+    { time: '08:30', en: 'Ceremony', icon: '/assets/images/icons/icon-ceremony.png', title: '婚礼典礼', desc: '新人入场，交换戒指，庄严宣誓' },
+    { time: '09:30', en: 'Banquet', icon: '/assets/images/icons/icon-banquet.png', title: '喜宴开席', desc: '美酒佳肴，共庆美好时刻' },
+    { time: '11:00', en: 'Photos', icon: '/assets/images/icons/icon-photos.png', title: '合影留念', desc: '与新人合影，记录美好瞬间' }
   ],
   photos: [
     {

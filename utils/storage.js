@@ -67,14 +67,16 @@ function mergeWedding(saved) {
   if (merged.coverImage && merged.coverImage.indexOf('images.unsplash.com') > -1) {
     merged.coverImage = DEFAULT_WEDDING.coverImage
   }
-  // 旧配置的流程条目没有英文名（en），按序号回填默认值，保证左右分栏排版完整
+  // 旧配置的流程条目没有英文名（en）和图标（icon），按序号回填默认值，保证左右分栏排版完整
   if (Array.isArray(merged.timeline)) {
     merged.timeline = merged.timeline.map((item, i) => {
       const fallback = DEFAULT_WEDDING.timeline[i] || {}
-      if (item && item.en) {
-        return item
+      return {
+        ...fallback,
+        ...item,
+        en: item.en || fallback.en,
+        icon: item.icon || fallback.icon
       }
-      return { ...fallback, ...item, en: fallback.en }
     })
   }
   return merged

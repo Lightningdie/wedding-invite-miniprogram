@@ -2,7 +2,7 @@
 <view class="admin-page">
   <view class="hero-card">
     <view class="hero-label">婚礼邀请函后台</view>
-    <view class="hero-names">{{wedding.groom}} & {{wedding.bride}}</view>
+    <view class="hero-names">{{wedding.groom}} | {{wedding.bride}}</view>
     <view class="hero-meta">{{wedding.solarDate}} · {{wedding.ceremonyTime}}</view>
     <view class="hero-venue">{{wedding.venueName}} · {{wedding.venueHall}}</view>
   </view>

@@ -14,17 +14,13 @@ Page({
     },
     blessings: [],
     wedding: {},
-    mapMarkers: [],
     musicOn: false,
     cloudTip: '',
     // 各区块滚入视口时点亮入场动画
     revealed: {
       hero: true,
       invitation: false,
-      info: false,
       photos: false,
-      story: false,
-      map: false,
       timeline: false,
       rsvp: false
     }
@@ -61,29 +57,12 @@ Page({
 
   async loadWedding() {
     const wedding = await storage.loadWeddingAsync()
-    this.setData({
-      wedding,
-      mapMarkers: [{
-        id: 1,
-        latitude: wedding.latitude,
-        longitude: wedding.longitude,
-        title: wedding.venueName,
-        width: 28,
-        height: 40,
-        callout: {
-          content: `${wedding.venueName}\n${wedding.venueHall}`,
-          display: 'ALWAYS',
-          padding: 8,
-          borderRadius: 8,
-          fontSize: 12
-        }
-      }]
-    })
+    this.setData({ wedding })
   },
 
   setupReveal() {
     this.destroyObservers()
-    const ids = ['invitation', 'info', 'photos', 'story', 'map', 'timeline', 'rsvp']
+    const ids = ['invitation', 'photos', 'timeline', 'rsvp']
     this._observers = ids.map((id) => {
       const ob = this.createIntersectionObserver({ thresholds: [0.1] })
       ob.relativeToViewport().observe('#sec-' + id, (res) => {
@@ -204,20 +183,6 @@ Page({
   async loadBlessings() {
     const blessings = await storage.loadBlessingsAsync()
     this.setData({ blessings })
-  },
-
-  navigateToVenue() {
-    const w = this.data.wedding
-    wx.openLocation({
-      latitude: Number(w.latitude),
-      longitude: Number(w.longitude),
-      name: w.venueName,
-      address: `${w.venueAddress} ${w.venueHall}`,
-      scale: 18,
-      fail: () => {
-        wx.showToast({ title: '打开地图失败，请检查定位权限', icon: 'none' })
-      }
-    })
   },
 
   onToggleMusic() {

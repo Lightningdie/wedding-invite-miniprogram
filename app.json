@@ -12,15 +12,6 @@
     "navigationBarTextStyle": "black",
     "backgroundColor": "#FFF8F0"
   },
-  "permission": {
-    "scope.userLocation": {
-      "desc": "用于婚礼场地导航定位"
-    }
-  },
-  "requiredPrivateInfos": [
-    "getLocation",
-    "chooseLocation"
-  ],
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

@@ -45,32 +45,6 @@
     </view>
   </view>
 
-  <!-- ========== 婚礼信息 ========== -->
-  <view class="sec info-sheet parchment {{revealed.info ? 'reveal' : ''}}" id="sec-info">
-    <view class="corner corner-tl"></view>
-    <view class="corner corner-br"></view>
-    <view class="latin-tag enter enter-down d1">Details</view>
-    <view class="section-title enter enter-left d2">婚礼信息</view>
-    <view class="ornament enter enter-right d3">✦</view>
-    <view class="info-stack">
-      <view class="info-block enter enter-left d4">
-        <view class="info-label">Date</view>
-        <view class="info-big">{{wedding.solarDate}}</view>
-        <view class="info-sub">{{wedding.weekDay}} · 农历{{wedding.lunarDate}}</view>
-      </view>
-      <view class="info-block shift-right enter enter-right d5">
-        <view class="info-label">Ceremony</view>
-        <view class="info-big time-big">{{wedding.ceremonyTime}}</view>
-        <view class="info-sub">典礼开始 · 请提前到场</view>
-      </view>
-      <view class="info-block enter enter-up d6">
-        <view class="info-label">Venue</view>
-        <view class="info-venue">{{wedding.venueName}}</view>
-        <view class="info-sub">{{wedding.venueHall}}</view>
-      </view>
-    </view>
-  </view>
-
   <!-- ========== 甜蜜相册 ========== -->
   <view class="sec photos-sheet parchment {{revealed.photos ? 'reveal' : ''}}" id="sec-photos">
     <view class="latin-tag enter enter-down d1">Gallery</view>
@@ -91,25 +65,6 @@
     </view>
   </view>
 
-  <!-- ========== 我们的故事 ========== -->
-  <view class="sec story-sheet parchment {{revealed.story ? 'reveal' : ''}}" id="sec-story">
-    <view class="latin-tag enter enter-down d1">Our Story</view>
-    <view class="section-title enter enter-right d2">我们的故事</view>
-    <view class="ornament enter enter-left d3">❧</view>
-    <view class="story-list">
-      <view
-        class="story-chapter-block enter {{index % 2 === 0 ? 'enter-left' : 'enter-right'}} d{{index + 3}}"
-        wx:for="{{wedding.stories}}"
-        wx:key="title"
-      >
-        <view class="story-num">{{item.chapter}}</view>
-        <view class="story-title">{{item.title}}</view>
-        <view class="story-rule"></view>
-        <view class="story-content">{{item.content}}</view>
-      </view>
-    </view>
-  </view>
-
   <!-- ========== 婚礼流程 ========== -->
   <view class="sec timeline-sheet parchment {{revealed.timeline ? 'reveal' : ''}}" id="sec-timeline">
     <view class="tl-head enter enter-down d1">
@@ -123,7 +78,10 @@
         wx:for="{{wedding.timeline}}"
         wx:key="time"
       >
-        <view class="tl-left">{{item.en}}</view>
+        <view class="tl-left">
+          <image class="tl-ic" src="{{item.icon}}" mode="aspectFit"></image>
+          <text class="tl-en">{{item.en}}</text>
+        </view>
         <view class="tl-line"></view>
         <view class="tl-right">
           <view class="tl-time">{{item.time}}</view>
@@ -132,31 +90,13 @@
         </view>
       </view>
     </view>
-  </view>
 
-  <!-- ========== 地点导航 ========== -->
-  <view class="sec map-sheet parchment {{revealed.map ? 'reveal' : ''}}" id="sec-map">
-    <view class="tl-script enter enter-down d1">Wedding address</view>
-    <view class="map-venue enter enter-right d2">
-      <view class="venue-name">{{wedding.venueName}}</view>
-      <view class="venue-hall">{{wedding.venueHall}}</view>
-      <view class="venue-address">{{wedding.venueAddress}}</view>
-    </view>
-    <map
-      class="venue-map enter enter-up d4"
-      latitude="{{wedding.latitude}}"
-      longitude="{{wedding.longitude}}"
-      scale="16"
-      show-location="{{true}}"
-      markers="{{mapMarkers}}"
-      enable-scroll="{{false}}"
-      enable-zoom="{{false}}"
-    ></map>
-    <button class="nav-btn enter enter-up d5" bindtap="navigateToVenue">开启导航</button>
-    <view class="tip-list enter enter-down d6">
-      <view class="tip-item" wx:for="{{wedding.transportTips}}" wx:key="text">
-        <text>{{item.text}}</text>
-      </view>
+    <!-- 婚礼地点：与流程同页，去掉地图与导航按钮 -->
+    <view class="tl-address enter enter-up d7">
+      <view class="tl-script">Wedding address</view>
+      <view class="tl-venue">{{wedding.venueName}}</view>
+      <view class="tl-hall">{{wedding.venueHall}}</view>
+      <view class="tl-addr">{{wedding.venueAddress}}</view>
     </view>
   </view>
 

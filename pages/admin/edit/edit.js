@@ -37,27 +37,6 @@ Page({
     })
   },
 
-  pickLocation() {
-    wx.chooseLocation({
-      success: (res) => {
-        const patch = {
-          'form.latitude': String(res.latitude),
-          'form.longitude': String(res.longitude)
-        }
-        if (res.address) {
-          patch['form.venueAddress'] = res.address
-        }
-        if (res.name) {
-          patch['form.venueName'] = res.name
-        }
-        this.setData(patch)
-      },
-      fail: () => {
-        wx.showToast({ title: '请授权位置后重试', icon: 'none' })
-      }
-    })
-  },
-
   async saveForm() {
     const form = this.data.form
     storage.setWedding({

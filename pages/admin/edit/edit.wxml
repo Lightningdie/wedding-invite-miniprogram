@@ -47,7 +47,6 @@
       <input class="input half" value="{{form.latitude}}" data-field="latitude" bindinput="onInput" placeholder="纬度" />
       <input class="input half" value="{{form.longitude}}" data-field="longitude" bindinput="onInput" placeholder="经度" />
     </view>
-    <button class="loc-btn" bindtap="pickLocation">从地图选点</button>
   </view>
 
   <view class="form-group">
