@@ -6,7 +6,8 @@
       { "type": "file", "value": "secondpage.jpg" },
       { "type": "folder", "value": "pdf_images" },
       { "type": "file", "value": "婚礼请柬修改方案(1).pdf" },
-      { "type": "file", "value": "README.md" }
+      { "type": "file", "value": "README.md" },
+      { "type": "folder", "value": ".claude" }
     ],
     "include": []
   },

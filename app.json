@@ -7,11 +7,12 @@
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#FFF8F0",
+    "navigationBarBackgroundColor": "#FAF5EC",
     "navigationBarTitleText": "婚礼邀请函",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#FFF8F0"
+    "backgroundColor": "#FAF5EC"
   },
+  "lazyCodeLoading": "requiredComponents",
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

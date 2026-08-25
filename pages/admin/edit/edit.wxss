@@ -33,32 +33,6 @@
   margin-top: 10rpx;
 }
 
-.loc-box {
-  margin-bottom: 28rpx;
-}
-
-.loc-row {
-  display: flex;
-  gap: 16rpx;
-  margin-bottom: 16rpx;
-}
-
-.half {
-  flex: 1;
-}
-
-.loc-btn {
-  background: #fff;
-  color: #8B7355;
-  border: 1rpx solid #D4AF37;
-  border-radius: 40rpx;
-  font-size: 26rpx;
-}
-
-.loc-btn::after {
-  border: none;
-}
-
 .save-btn {
   margin-top: 20rpx;
   background: linear-gradient(135deg, #D4AF37 0%, #C4A030 100%);

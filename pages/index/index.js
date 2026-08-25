@@ -7,12 +7,16 @@ Page({
     hours: '00',
     minutes: '00',
     seconds: '00',
+    // 婚期已到：倒计时卡片切换为「今天我们结婚啦」
+    isWeddingDay: false,
     formData: {
       name: '',
       count: '',
       message: ''
     },
     blessings: [],
+    blessingsLoading: true,
+    latestBlessingId: 0,
     wedding: {},
     musicOn: false,
     cloudTip: '',
@@ -107,7 +111,8 @@ Page({
         days: '00',
         hours: '00',
         minutes: '00',
-        seconds: '00'
+        seconds: '00',
+        isWeddingDay: true
       })
       clearInterval(this.countdownTimer)
       return
@@ -122,7 +127,8 @@ Page({
       days: storage.padZero(days),
       hours: storage.padZero(hours),
       minutes: storage.padZero(minutes),
-      seconds: storage.padZero(seconds)
+      seconds: storage.padZero(seconds),
+      isWeddingDay: false
     })
   },
 
@@ -161,6 +167,7 @@ Page({
     this.setData({
       blessings: result.list,
       formData: { name: '', count: '', message: '' },
+      latestBlessingId: blessing.id,
       cloudTip: result.cloud ? '已同步云数据库' : '已永久保存在本地（开通云开发后可同步）'
     })
 
@@ -182,10 +189,20 @@ Page({
 
   async loadBlessings() {
     const blessings = await storage.loadBlessingsAsync()
-    this.setData({ blessings })
+    this.setData({ blessings, blessingsLoading: false })
   },
 
   onToggleMusic() {
+    // 后台入口暗门：3 秒内连点 5 次进入管理页，替代长按，避免宾客误触
+    const now = Date.now()
+    this._musicTaps = (this._musicTaps || []).filter((t) => now - t < 3000)
+    this._musicTaps.push(now)
+    if (this._musicTaps.length >= 5) {
+      this._musicTaps = []
+      this.goAdmin()
+      return
+    }
+
     const src = this.data.wedding.musicSrc
     if (!src) {
       wx.showToast({ title: '请先上传背景音乐', icon: 'none' })
@@ -218,14 +235,16 @@ Page({
     const w = this.data.wedding
     return {
       title: `${w.groom} & ${w.bride} 的婚礼邀请函`,
-      path: '/pages/index/index'
+      path: '/pages/index/index',
+      imageUrl: w.coverImage
     }
   },
 
   onShareTimeline() {
     const w = this.data.wedding
     return {
-      title: `${w.groom} & ${w.bride} 的婚礼邀请函`
+      title: `${w.groom} & ${w.bride} 的婚礼邀请函`,
+      imageUrl: w.coverImage
     }
   }
 })

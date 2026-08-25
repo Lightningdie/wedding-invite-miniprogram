@@ -30,7 +30,7 @@
     </view>
     <view class="menu-item" bindtap="goEdit">
       <view class="menu-title">编辑信息</view>
-      <view class="menu-desc">修改新人、日期、场地与坐标</view>
+      <view class="menu-desc">修改新人、日期与场地信息</view>
       <text class="menu-arrow">›</text>
     </view>
     <view class="menu-item" bindtap="goGuests">

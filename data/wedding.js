@@ -13,8 +13,6 @@ const DEFAULT_WEDDING = {
   venueName: '盐山县县宾馆',
   venueHall: '五楼宴会厅',
   venueAddress: '河北省沧州市盐山县振华北大街263号',
-  latitude: 38.0725,
-  longitude: 117.2365,
   musicSrc: '/assets/music/bgm.mp3',
   musicTitle: '婚礼背景音乐',
   closing: '愿这份喜悦，亦能与您常在。',

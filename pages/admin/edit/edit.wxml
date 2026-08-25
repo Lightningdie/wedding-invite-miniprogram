@@ -41,14 +41,6 @@
     <input class="input" value="{{form.venueAddress}}" data-field="venueAddress" bindinput="onInput" />
   </view>
 
-  <view class="loc-box">
-    <view class="label">地图坐标</view>
-    <view class="loc-row">
-      <input class="input half" value="{{form.latitude}}" data-field="latitude" bindinput="onInput" placeholder="纬度" />
-      <input class="input half" value="{{form.longitude}}" data-field="longitude" bindinput="onInput" placeholder="经度" />
-    </view>
-  </view>
-
   <view class="form-group">
     <view class="label">背景音乐路径</view>
     <input class="input" value="{{form.musicSrc}}" data-field="musicSrc" bindinput="onInput" />

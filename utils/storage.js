@@ -67,6 +67,9 @@ function mergeWedding(saved) {
   if (merged.coverImage && merged.coverImage.indexOf('images.unsplash.com') > -1) {
     merged.coverImage = DEFAULT_WEDDING.coverImage
   }
+  // 地图导航功能已移除，清理旧配置里遗留的经纬度
+  delete merged.latitude
+  delete merged.longitude
   // 旧配置的流程条目没有英文名（en）和图标（icon），按序号回填默认值，保证左右分栏排版完整
   if (Array.isArray(merged.timeline)) {
     merged.timeline = merged.timeline.map((item, i) => {

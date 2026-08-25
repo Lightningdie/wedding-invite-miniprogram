@@ -23,8 +23,6 @@ Page({
         venueName: wedding.venueName,
         venueHall: wedding.venueHall,
         venueAddress: wedding.venueAddress,
-        latitude: String(wedding.latitude),
-        longitude: String(wedding.longitude),
         musicSrc: wedding.musicSrc
       }
     })
@@ -50,8 +48,6 @@ Page({
       venueName: form.venueName,
       venueHall: form.venueHall,
       venueAddress: form.venueAddress,
-      latitude: Number(form.latitude),
-      longitude: Number(form.longitude),
       musicSrc: form.musicSrc
     })
     wx.showToast({

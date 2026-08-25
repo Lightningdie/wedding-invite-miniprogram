@@ -1,7 +1,7 @@
 <!--pages/index/index.wxml-->
 <view class="invite">
 
-  <view class="music-btn {{musicOn ? 'music-on' : ''}}" bindtap="onToggleMusic" bindlongpress="goAdmin">
+  <view class="music-btn {{musicOn ? 'music-on' : ''}}" bindtap="onToggleMusic">
     <image class="music-icon" src="/assets/images/music-note.png"></image>
     <view class="music-slash" wx:if="{{!musicOn}}"></view>
   </view>
@@ -23,6 +23,31 @@
 
   <!-- ========== 邀请 ========== -->
   <view class="sec invitation-sheet parchment {{revealed.invitation ? 'reveal' : ''}}" id="sec-invitation">
+    <!-- 倒计时：婚期前倒数，当天切换为「今天我们结婚啦」 -->
+    <view class="countdown-card enter enter-down d1" wx:if="{{wedding.weddingDate}}">
+      <block wx:if="{{!isWeddingDay}}">
+        <view class="countdown-caption">距婚礼盛典还有</view>
+        <view class="countdown-row">
+          <view class="countdown-cell">
+            <view class="countdown-num">{{days}}</view>
+            <view class="countdown-label">天</view>
+          </view>
+          <view class="countdown-cell">
+            <view class="countdown-num">{{hours}}</view>
+            <view class="countdown-label">时</view>
+          </view>
+          <view class="countdown-cell">
+            <view class="countdown-num">{{minutes}}</view>
+            <view class="countdown-label">分</view>
+          </view>
+          <view class="countdown-cell">
+            <view class="countdown-num">{{seconds}}</view>
+            <view class="countdown-label">秒</view>
+          </view>
+        </view>
+      </block>
+      <view class="countdown-today" wx:else>❦ 今天，我们结婚啦 ❦</view>
+    </view>
     <view class="invite-headline enter enter-down d1">{{wedding.inviteHeadline}}</view>
     <view class="invite-photo-wrap enter enter-up d2">
       <image class="invite-photo" src="{{wedding.inviteImage}}" mode="aspectFill"></image>
@@ -120,15 +145,28 @@
       <view class="persist-tip" wx:if="{{cloudTip}}">{{cloudTip}}</view>
     </view>
 
-    <view class="blessing-wall enter enter-right d5" wx:if="{{blessings.length > 0}}">
+    <view class="blessing-wall enter enter-right d5">
       <view class="wall-title">Guest Book</view>
-      <view class="blessing-item" wx:for="{{blessings}}" wx:key="id">
-        <view class="blessing-header">
-          <text class="blessing-name">{{item.name}}</text>
-          <text class="blessing-time">{{item.time}}</text>
+      <!-- 云端读取中：骨架占位 -->
+      <block wx:if="{{blessingsLoading}}">
+        <view class="blessing-skeleton" wx:for="{{[1, 2]}}" wx:key="*this">
+          <view class="skeleton-line skeleton-name"></view>
+          <view class="skeleton-line"></view>
         </view>
-        <view class="blessing-content">{{item.message}}</view>
+      </block>
+      <!-- 空态：邀请留言 -->
+      <view class="blessing-empty" wx:elif="{{blessings.length === 0}}">
+        还没有祝福，来写下第一条吧 ♡
       </view>
+      <block wx:else>
+        <view class="blessing-item {{item.id === latestBlessingId ? 'blessing-new' : ''}}" wx:for="{{blessings}}" wx:key="id">
+          <view class="blessing-header">
+            <text class="blessing-name">{{item.name}}</text>
+            <text class="blessing-time">{{item.time}}</text>
+          </view>
+          <view class="blessing-content">{{item.message}}</view>
+        </view>
+      </block>
     </view>
 
     <view class="footer-mini enter enter-up d6">
