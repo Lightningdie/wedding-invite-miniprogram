@@ -1,5 +1,5 @@
 {
-  "description": "婚礼邀请函小程序",
+  "description": "Amour・爱意佳期 婚礼邀请函",
   "packOptions": {
     "ignore": [
       { "type": "file", "value": "firstpage.jpg" },
@@ -7,7 +7,10 @@
       { "type": "folder", "value": "pdf_images" },
       { "type": "file", "value": "婚礼请柬修改方案(1).pdf" },
       { "type": "file", "value": "README.md" },
-      { "type": "folder", "value": ".claude" }
+      { "type": "folder", "value": ".claude" },
+      { "type": "file", "value": "小程序头像.png" },
+      { "type": "glob", "value": "assets/images/*removebg-preview.png" },
+      { "type": "file", "value": "assets/images/微信图片_20260825144326_122836_2.png" }
     ],
     "include": []
   },
@@ -56,7 +59,7 @@
   "compileType": "miniprogram",
   "libVersion": "2.19.4",
   "appid": "wx772af07350cf2466",
-  "projectname": "wedding-invite",
+  "projectname": "Amour・爱意佳期",
   "condition": {},
   "editorSetting": {
     "tabIndent": "insertSpaces",

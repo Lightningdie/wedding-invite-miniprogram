@@ -14,7 +14,7 @@
   font-style: normal;
 }
 
-/* 欧式复古请柬 · 单页竖向连续滑动 · 隐藏滚动条 */
+/* 欧式复古请柬 · 整页竖向翻页 · 隐藏滚动条 */
 
 ::-webkit-scrollbar {
   width: 0 !important;
@@ -30,7 +30,8 @@
 
 .invite {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   /* 整页一整条连续渐变 + 多层柔光：白偏黄基调，既有层次又无接缝色差 */
   background:
     radial-gradient(circle at 20% 8%, rgba(255, 253, 248, 0.55), transparent 36%),
@@ -151,7 +152,7 @@
 .ornament {
   font-size: 40rpx;
   color: #C4A06A;
-  margin: 16rpx 0 48rpx;
+  margin: 12rpx 0 32rpx;
   align-self: center;
   opacity: 0.9;
   text-shadow: 0 0 18rpx rgba(196, 160, 106, 0.3);
@@ -203,7 +204,7 @@
 /* ========== 封面 ========== */
 .hero-sheet {
   padding: 0;
-  height: 100vh;
+  height: 100%;
   align-items: center;
   overflow: hidden;
   background: #FAF5EB;
@@ -269,6 +270,62 @@
   color: #FFFFFF;
   letter-spacing: 0;
   text-shadow: 0 2rpx 22rpx rgba(70, 50, 30, 0.42), 0 0 2rpx rgba(70, 50, 30, 0.3);
+}
+
+/* 倒计时：位于花体下方，无边框、紧凑一行，与花体同风格 */
+.countdown-card {
+  margin-top: 24rpx;
+  text-align: center;
+}
+
+.countdown-caption {
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: 20rpx;
+  letter-spacing: 8rpx;
+  text-indent: 8rpx;
+  color: rgba(255, 252, 244, 0.88);
+  margin-bottom: 2rpx;
+  text-shadow: 0 1rpx 12rpx rgba(70, 50, 30, 0.55);
+}
+
+.countdown-row {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  line-height: 1;
+}
+
+.countdown-cell {
+  display: flex;
+  align-items: baseline;
+  margin: 0 11rpx;
+}
+
+.countdown-num {
+  font-family: 'AlexBrush', 'Snell Roundhand', 'Brush Script MT', cursive;
+  font-size: 52rpx;
+  line-height: 1.2;
+  color: #FFFDF6;
+  text-shadow: 0 2rpx 16rpx rgba(70, 50, 30, 0.5), 0 0 2rpx rgba(70, 50, 30, 0.35);
+}
+
+.countdown-label {
+  margin-left: 6rpx;
+  font-family: Georgia, 'Songti SC', serif;
+  font-size: 20rpx;
+  letter-spacing: 2rpx;
+  color: rgba(255, 252, 244, 0.82);
+  text-shadow: 0 1rpx 12rpx rgba(70, 50, 30, 0.55);
+}
+
+/* 当天文案 */
+.countdown-today {
+  font-family: 'Kaiti SC', 'STKaiti', 'KaiTi', '楷体', Georgia, serif;
+  font-size: 32rpx;
+  letter-spacing: 6rpx;
+  color: #FFFDF6;
+  line-height: 1.4;
+  text-shadow: 0 2rpx 16rpx rgba(70, 50, 30, 0.5), 0 0 2rpx rgba(70, 50, 30, 0.35);
 }
 
 /* 姓名与日期：叠在底部晕染之上，黑色字 */
@@ -337,62 +394,6 @@
   content: none;
 }
 
-/* 倒计时卡片：婚期前倒数，当天切换为祝福语 */
-.countdown-card {
-  align-self: center;
-  width: 560rpx;
-  max-width: 100%;
-  box-sizing: border-box;
-  padding: 30rpx 24rpx 26rpx;
-  margin: 0 0 44rpx;
-  border: 1rpx solid rgba(196, 160, 106, 0.4);
-  background: rgba(255, 252, 247, 0.5);
-  text-align: center;
-}
-
-.countdown-caption {
-  font-size: 22rpx;
-  letter-spacing: 6rpx;
-  color: #A67C52;
-  font-style: italic;
-  font-family: Georgia, 'Songti SC', serif;
-  margin-bottom: 20rpx;
-}
-
-.countdown-row {
-  display: flex;
-  justify-content: center;
-}
-
-.countdown-cell { margin: 0 14rpx; }
-
-.countdown-num {
-  width: 96rpx;
-  height: 96rpx;
-  line-height: 96rpx;
-  border: 1rpx solid rgba(196, 160, 106, 0.5);
-  background: rgba(255, 255, 255, 0.35);
-  font-family: Georgia, serif;
-  font-size: 44rpx;
-  color: #5C4030;
-}
-
-.countdown-label {
-  margin-top: 10rpx;
-  font-size: 20rpx;
-  color: #A67C52;
-  letter-spacing: 2rpx;
-}
-
-/* 当天文案 */
-.countdown-today {
-  font-family: 'Kaiti SC', 'STKaiti', 'KaiTi', '楷体', Georgia, serif;
-  font-size: 34rpx;
-  letter-spacing: 6rpx;
-  color: #5C4030;
-  line-height: 1.6;
-}
-
 /* 第一行：英文标题（Alex Brush 简洁手写体，缩到一行内） */
 .invite-headline {
   margin: 0 0 36rpx;
@@ -414,11 +415,12 @@
   .invite-headline { font-size: 32rpx; }
 }
 
-/* 第二行：整幅出血照片，底部晕染进底色 */
+/* 第二行：整幅出血照片，底部晕染进底色（按屏高取值，保证整页放得下） */
 .invite-photo-wrap {
   position: relative;
   width: 100%;
-  height: 780rpx;
+  height: 36vh;
+  min-height: 300rpx;
   margin: 0;
   overflow: hidden;
 }
@@ -458,7 +460,7 @@
 
 /* 凑字排版：浅灰色英文段落 */
 .invite-filler {
-  margin-top:  50rpx;
+  margin-top: 36rpx;
   text-align: center;
 }
 
@@ -539,12 +541,12 @@
 
 .tl-head {
   text-align: center;
-  margin-bottom: 36rpx;
+  margin-bottom: 18rpx;
 }
 
 .tl-script {
   font-family: 'GreatVibes', 'Snell Roundhand', 'Brush Script MT', cursive;
-  font-size: 72rpx;
+  font-size: 54rpx;
   line-height: 1.25;
   color: #A23B32;
   letter-spacing: 0;
@@ -552,16 +554,16 @@
 }
 
 .tl-date {
-  margin-top: 4rpx;
+  margin-top: 2rpx;
   font-family: Georgia, 'Songti SC', serif;
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 600;
   color: #241E17;
   letter-spacing: 4rpx;
 }
 
 .tl-lunar {
-  margin-top: 6rpx;
+  margin-top: 4rpx;
   font-size: 22rpx;
   color: #4A423A;
   letter-spacing: 3rpx;
@@ -611,19 +613,19 @@
 
 .tl-right {
   flex: 1;
-  padding: 16rpx 0 18rpx 26rpx;
+  padding: 8rpx 0 8rpx 26rpx;
 }
 
 .tl-time {
   font-family: Georgia, serif;
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 600;
   color: #241E17;
   letter-spacing: 2rpx;
 }
 
 .tl-title {
-  margin-top: 3rpx;
+  margin-top: 2rpx;
   font-family: Georgia, 'Songti SC', serif;
   font-size: 25rpx;
   color: #3A322A;
@@ -639,20 +641,20 @@
 
 /* 婚礼地点：并入流程页，仅保留文字信息 */
 .tl-address {
-  margin-top: 56rpx;
+  margin-top: 24rpx;
   text-align: center;
 }
 
 .tl-venue {
-  margin-top: 18rpx;
+  margin-top: 10rpx;
   font-family: Georgia, 'Songti SC', serif;
-  font-size: 34rpx;
+  font-size: 30rpx;
   color: #241E17;
   letter-spacing: 3rpx;
 }
 
 .tl-hall {
-  margin-top: 8rpx;
+  margin-top: 4rpx;
   font-size: 25rpx;
   color: #A67C52;
   font-style: italic;
@@ -660,7 +662,7 @@
 }
 
 .tl-addr {
-  margin-top: 8rpx;
+  margin-top: 4rpx;
   font-size: 22rpx;
   color: #9A8068;
   letter-spacing: 1rpx;
@@ -670,12 +672,12 @@
 /* ========== 祝福留言 ========== */
 .rsvp-form {
   border: 1rpx solid rgba(196, 160, 106, 0.45);
-  padding: 36rpx 28rpx;
-  margin-bottom: 36rpx;
+  padding: 28rpx 28rpx 24rpx;
+  margin-bottom: 16rpx;
   background: rgba(255, 252, 247, 0.55);
 }
 
-.form-item { margin-bottom: 20rpx; }
+.form-item { margin-bottom: 16rpx; }
 
 .form-input {
   width: 100%;
@@ -691,7 +693,7 @@
 
 .form-textarea {
   width: 100%;
-  height: 140rpx;
+  height: 110rpx;
   background: transparent;
   border: 1rpx solid rgba(196, 160, 106, 0.35);
   padding: 16rpx;
@@ -727,7 +729,7 @@
   letter-spacing: 6rpx;
   color: #A67C52;
   font-style: italic;
-  margin-bottom: 20rpx;
+  margin-bottom: 12rpx;
   text-align: center;
 }
 
@@ -801,15 +803,15 @@
 /* 落款 */
 .footer-mini {
   text-align: center;
-  padding: 72rpx 0 56rpx;
-  margin-top: 24rpx;
+  padding: 24rpx 0 0;
+  margin-top: 16rpx;
 }
 
 .footer-rule {
   width: 96rpx;
   height: 1rpx;
   background: linear-gradient(90deg, transparent, #C4A06A, transparent);
-  margin: 0 auto 36rpx;
+  margin: 0 auto 20rpx;
 }
 
 .footer-closing {
@@ -817,7 +819,7 @@
   color: #8B7355;
   letter-spacing: 3rpx;
   line-height: 1.8;
-  margin-bottom: 40rpx;
+  margin-bottom: 16rpx;
   font-family: Georgia, 'Songti SC', serif;
 }
 
@@ -841,4 +843,142 @@
   color: #9A8068;
   letter-spacing: 4rpx;
   font-style: italic;
+}
+
+/* ========== 分享 ========== */
+/* 引导小字：转发与朋友圈分享均从右上角菜单进入 */
+.share-tip {
+  text-align: center;
+  font-size: 20rpx;
+  color: #A09080;
+  letter-spacing: 2rpx;
+}
+
+/* ========== 整页翻页（swiper）布局：每页占满一屏 ========== */
+.page-swiper {
+  width: 100%;
+  height: 100vh;
+}
+
+/* swiper-item 内的区块铺满整屏，水平留白沿用原间距 */
+.page-swiper .sec {
+  height: 100%;
+  padding: 0 48rpx;
+}
+
+.page-swiper .hero-sheet {
+  padding: 0;
+}
+
+.page-swiper .photos-sheet {
+  padding: 84rpx 48rpx 24rpx;
+}
+
+.page-swiper .timeline-sheet {
+  padding: 52rpx 44rpx 32rpx;
+}
+
+.page-swiper .rsvp-sheet {
+  padding: 60rpx 48rpx 36rpx;
+  /* 末页元素垂直均匀分布，不顶格 */
+  justify-content: space-evenly;
+}
+
+/* 页内固定内容不压缩，剩余空间让给滚动区 */
+.page-swiper .sec > view {
+  flex-shrink: 0;
+}
+
+.page-swiper .sec > .inner-scroll,
+.page-swiper .sec > .blessing-wall {
+  flex-shrink: 1;
+}
+
+/* 页内滚动区：相册整页滚，邀请/流程兜底滚，祝福墙定高滚 */
+.inner-scroll {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* 祝福墙按内容自适应高度，超出上限内部滚动，把剩余空间留给均匀间距 */
+.blessing-wall {
+  flex: 0 1 auto;
+  max-height: 40vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.blessing-wall-scroll {
+  min-height: 160rpx;
+}
+
+/* 滚动区内容不满一屏时垂直居中，满屏则自然排列 */
+.page-body {
+  min-height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pb-invitation {
+  padding: 28rpx 0;
+}
+
+.pb-timeline {
+  padding: 20rpx 0;
+}
+
+/* 右侧页码指示点：点击直达对应页 */
+.page-dots {
+  position: fixed;
+  right: 14rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 60;
+}
+
+.page-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: rgba(122, 101, 78, 0.32);
+  margin: 9rpx 0;
+  box-shadow: 0 1rpx 4rpx rgba(70, 50, 30, 0.16);
+  transition: height 0.25s ease, background 0.25s ease;
+}
+
+.page-dot.active {
+  height: 30rpx;
+  border-radius: 6rpx;
+  background: #C4A06A;
+}
+
+/* ========== 短屏适配：压缩字号与间距，保证每页完整显示 ========== */
+@media (max-height: 640px) {
+  .hero-script { font-size: 84rpx; }
+  .hero-content { padding-top: 19vh; }
+  .countdown-num { font-size: 44rpx; }
+  .hero-names { font-size: 48rpx; }
+  .hero-landing { bottom: 112rpx; }
+  .section-title { font-size: 46rpx; }
+  .ornament { margin: 8rpx 0 22rpx; }
+  .tl-script { font-size: 46rpx; }
+  .tl-desc { display: none; }
+  .invitation-text { font-size: 27rpx; line-height: 2; }
+  .invite-filler { margin-top: 28rpx; }
+  .form-textarea { height: 100rpx; }
+  .footer-mini { padding-top: 14rpx; }
+  .blessing-wall-scroll { min-height: 120rpx; }
+}
+
+@media (max-height: 580px) {
+  .invite-photo-wrap { height: 28vh; min-height: 240rpx; }
+  .invite-filler { display: none; }
+  .tl-address { margin-top: 18rpx; }
+  .hero-date { margin-top: 10rpx; }
 }

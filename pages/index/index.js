@@ -1,6 +1,11 @@
 const storage = require('../../utils/storage.js')
 const music = require('../../utils/music.js')
 
+// 整页翻页：每页对应的入场动画开关名
+const PAGE_KEYS = ['hero', 'invitation', 'photos', 'timeline', 'rsvp']
+// 页内滚动区（与整页滑动手势衔接）：页码 -> scroll-view 标识
+const PAGE_SCROLL_KEYS = { 1: 'invitation', 2: 'gallery', 3: 'timeline', 4: 'wall' }
+
 Page({
   data: {
     days: '00',
@@ -20,7 +25,8 @@ Page({
     wedding: {},
     musicOn: false,
     cloudTip: '',
-    // 各区块滚入视口时点亮入场动画
+    current: 0,
+    // 翻到某页后点亮该页入场动画，离开时复位以便下次重放
     revealed: {
       hero: true,
       invitation: false,
@@ -31,15 +37,12 @@ Page({
   },
 
   countdownTimer: null,
-  _observers: [],
+  _revealTimer: null,
+  _edges: {},
 
   onLoad() {
     this.bootstrap()
-  },
-
-  onReady() {
-    // 首帧渲染完成后挂载滚动监听，确保节点已存在
-    this.setupReveal()
+    this.enableShare()
   },
 
   onShow() {
@@ -50,7 +53,9 @@ Page({
     if (this.countdownTimer) {
       clearInterval(this.countdownTimer)
     }
-    this.destroyObservers()
+    if (this._revealTimer) {
+      clearTimeout(this._revealTimer)
+    }
   },
 
   async bootstrap() {
@@ -64,30 +69,109 @@ Page({
     this.setData({ wedding })
   },
 
-  setupReveal() {
-    this.destroyObservers()
-    const ids = ['invitation', 'photos', 'timeline', 'rsvp']
-    this._observers = ids.map((id) => {
-      const ob = this.createIntersectionObserver({ thresholds: [0.1] })
-      ob.relativeToViewport().observe('#sec-' + id, (res) => {
-        if (res.intersectionRatio > 0.1) {
-          this.setData({ ['revealed.' + id]: true })
-          ob.disconnect()
-        }
-      })
-      return ob
+  // 翻页：先复位所有入场状态，滑入稳定后点亮当前页，内容按原有动画依次进入
+  onPageChange(e) {
+    const current = e.detail.current
+    if (this._revealTimer) {
+      clearTimeout(this._revealTimer)
+    }
+    const revealed = {}
+    PAGE_KEYS.forEach((key) => {
+      revealed[key] = false
+    })
+    this.setData({ current, revealed })
+    this._revealTimer = setTimeout(() => {
+      this.setData({ ['revealed.' + PAGE_KEYS[current]]: true })
+      this.syncEdges(PAGE_SCROLL_KEYS[current] || '')
+    }, 240)
+  },
+
+  goPage(index) {
+    if (index < 0 || index >= PAGE_KEYS.length || index === this.data.current) {
+      return
+    }
+    this.setData({ current: index })
+  },
+
+  onTapDot(e) {
+    this.goPage(Number(e.currentTarget.dataset.i))
+  },
+
+  // —— 页内滚动与整页翻页的手势衔接：滚到顶/底后再继续滑动即翻页 ——
+  getEdges(view) {
+    if (!this._edges[view]) {
+      this._edges[view] = { top: true, bottom: false }
+    }
+    return this._edges[view]
+  },
+
+  // 进入某页时同步该页滚动区边界：内容不满一屏时上下都放开，整页滑动始终可用
+  syncEdges(view) {
+    if (!view) {
+      return
+    }
+    const q = this.createSelectorQuery()
+    q.select('#scroll-' + view).boundingClientRect()
+    q.select('#body-' + view).boundingClientRect()
+    q.exec((res) => {
+      const box = res && res[0]
+      const body = res && res[1]
+      if (!box || !body) {
+        return
+      }
+      const edges = this.getEdges(view)
+      const scrollTop = Math.max(0, box.top - body.top)
+      if (body.height <= box.height + 4) {
+        edges.top = true
+        edges.bottom = true
+        return
+      }
+      edges.top = scrollTop <= 40
+      edges.bottom = body.height - scrollTop <= box.height + 40
     })
   },
 
-  destroyObservers() {
-    (this._observers || []).forEach((ob) => {
-      try {
-        ob.disconnect()
-      } catch (e) {
-        // ignore
-      }
-    })
-    this._observers = []
+  onInnerScroll(e) {
+    const edges = this.getEdges(e.currentTarget.dataset.view)
+    if (e.detail.deltaY > 0) {
+      edges.top = false
+    }
+    if (e.detail.deltaY < 0) {
+      edges.bottom = false
+    }
+  },
+
+  onInnerReachUpper(e) {
+    this.getEdges(e.currentTarget.dataset.view).top = true
+  },
+
+  onInnerReachLower(e) {
+    this.getEdges(e.currentTarget.dataset.view).bottom = true
+  },
+
+  onInnerTouchStart(e) {
+    this._innerY = e.touches[0].clientY
+    this._innerX = e.touches[0].clientX
+  },
+
+  onInnerTouchEnd(e) {
+    const view = e.currentTarget.dataset.view
+    const dy = (this._innerY || 0) - e.changedTouches[0].clientY
+    const dx = Math.abs((this._innerX || 0) - e.changedTouches[0].clientX)
+    if (dx > 60 || Math.abs(dy) < 45) {
+      return
+    }
+    const edges = this._edges[view]
+    if (!edges) {
+      return
+    }
+    if (dy > 0 && edges.bottom) {
+      edges.bottom = false
+      this.goPage(this.data.current + 1)
+    } else if (dy < 0 && edges.top) {
+      edges.top = false
+      this.goPage(this.data.current - 1)
+    }
   },
 
   startCountdown() {
@@ -231,6 +315,21 @@ Page({
     wx.navigateTo({ url: '/pages/admin/home/home' })
   },
 
+  // 打开右上角菜单的「转发」与「分享到朋友圈」入口（朋友圈仅安卓基础库 2.11.3+ 支持）
+  enableShare() {
+    if (!wx.showShareMenu) {
+      return
+    }
+    wx.showShareMenu({
+      withShareTicket: false,
+      menus: ['shareAppMessage', 'shareTimeline'],
+      fail: () => {
+        // 基础库过旧时静默忽略，转发入口仍由 onShareAppMessage 提供
+      }
+    })
+  },
+
+  // 转发给好友：button open-type="share" 与右上角菜单都会走到这里
   onShareAppMessage() {
     const w = this.data.wedding
     return {
@@ -240,6 +339,7 @@ Page({
     }
   },
 
+  // 分享到朋友圈：从右上角「···」菜单进入（仅安卓支持），点开后以单页模式浏览
   onShareTimeline() {
     const w = this.data.wedding
     return {

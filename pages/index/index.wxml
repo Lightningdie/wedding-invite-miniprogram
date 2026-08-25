@@ -1,4 +1,5 @@
 <!--pages/index/index.wxml-->
+<!-- 整页竖向翻页：上滑切换整页，新页内容沿用原有入场动画依次浮现 -->
 <view class="invite">
 
   <view class="music-btn {{musicOn ? 'music-on' : ''}}" bindtap="onToggleMusic">
@@ -6,176 +7,274 @@
     <view class="music-slash" wx:if="{{!musicOn}}"></view>
   </view>
 
-  <!-- ========== 封面 ========== -->
-  <view class="sec hero-sheet {{revealed.hero ? 'reveal' : ''}}" id="sec-hero">
-    <image class="hero-bg" src="{{wedding.coverImage}}" mode="aspectFill"></image>
-    <view class="hero-topshade"></view>
-    <view class="hero-bottomfade"></view>
-    <view class="hero-content">
-      <view class="hero-script enter enter-down d1">{{wedding.heroLatin}}</view>
-    </view>
-    <view class="hero-landing">
-      <view class="hero-names enter enter-up d3">{{wedding.groom}}<text class="hero-amp"> & </text>{{wedding.bride}}</view>
-      <view class="hero-date enter enter-up d4">{{wedding.solarDate}} · {{wedding.weekDay}} · 农历{{wedding.lunarDate}}</view>
-    </view>
-    <view class="scroll-hint">向下滑动 · 开启请柬</view>
-  </view>
+  <swiper class="page-swiper" vertical current="{{current}}" duration="420" bindchange="onPageChange">
 
-  <!-- ========== 邀请 ========== -->
-  <view class="sec invitation-sheet parchment {{revealed.invitation ? 'reveal' : ''}}" id="sec-invitation">
-    <!-- 倒计时：婚期前倒数，当天切换为「今天我们结婚啦」 -->
-    <view class="countdown-card enter enter-down d1" wx:if="{{wedding.weddingDate}}">
-      <block wx:if="{{!isWeddingDay}}">
-        <view class="countdown-caption">距婚礼盛典还有</view>
-        <view class="countdown-row">
-          <view class="countdown-cell">
-            <view class="countdown-num">{{days}}</view>
-            <view class="countdown-label">天</view>
-          </view>
-          <view class="countdown-cell">
-            <view class="countdown-num">{{hours}}</view>
-            <view class="countdown-label">时</view>
-          </view>
-          <view class="countdown-cell">
-            <view class="countdown-num">{{minutes}}</view>
-            <view class="countdown-label">分</view>
-          </view>
-          <view class="countdown-cell">
-            <view class="countdown-num">{{seconds}}</view>
-            <view class="countdown-label">秒</view>
+    <!-- ========== 第 1 页 · 封面 ========== -->
+    <swiper-item>
+      <view class="sec hero-sheet {{revealed.hero ? 'reveal' : ''}}" id="sec-hero">
+        <image class="hero-bg" src="{{wedding.coverImage}}" mode="aspectFill"></image>
+        <view class="hero-topshade"></view>
+        <view class="hero-bottomfade"></view>
+        <view class="hero-content">
+          <view class="hero-script enter enter-down d1">{{wedding.heroLatin}}</view>
+          <!-- 倒计时：位于花体下方，婚期前倒数，当天切换为祝福语 -->
+          <view class="countdown-card enter enter-down d2" wx:if="{{wedding.weddingDate}}">
+            <block wx:if="{{!isWeddingDay}}">
+              <view class="countdown-caption">距婚礼盛典还有</view>
+              <view class="countdown-row">
+                <view class="countdown-cell">
+                  <text class="countdown-num">{{days}}</text>
+                  <text class="countdown-label">天</text>
+                </view>
+                <view class="countdown-cell">
+                  <text class="countdown-num">{{hours}}</text>
+                  <text class="countdown-label">时</text>
+                </view>
+                <view class="countdown-cell">
+                  <text class="countdown-num">{{minutes}}</text>
+                  <text class="countdown-label">分</text>
+                </view>
+                <view class="countdown-cell">
+                  <text class="countdown-num">{{seconds}}</text>
+                  <text class="countdown-label">秒</text>
+                </view>
+              </view>
+            </block>
+            <view class="countdown-today" wx:else>❦ 今天，我们结婚啦 ❦</view>
           </view>
         </view>
-      </block>
-      <view class="countdown-today" wx:else>❦ 今天，我们结婚啦 ❦</view>
-    </view>
-    <view class="invite-headline enter enter-down d1">{{wedding.inviteHeadline}}</view>
-    <view class="invite-photo-wrap enter enter-up d2">
-      <image class="invite-photo" src="{{wedding.inviteImage}}" mode="aspectFill"></image>
-      <view class="invite-photo-fade"></view>
-    </view>
-    <view class="invite-body">
-      <view
-        class="invitation-text enter enter-up d{{index + 3}}"
-        wx:for="{{wedding.inviteLines}}"
-        wx:for-item="line"
-        wx:key="*this"
-      >
-        <text>{{line}}</text>
-      </view>
-    </view>
-    <view class="invite-filler enter enter-up d9">
-      <view class="filler-line" wx:for="{{wedding.inviteFiller}}" wx:key="*this">
-        <text>{{item}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- ========== 甜蜜相册 ========== -->
-  <view class="sec photos-sheet parchment {{revealed.photos ? 'reveal' : ''}}" id="sec-photos">
-    <view class="latin-tag enter enter-down d1">Gallery</view>
-    <view class="section-title enter enter-down d2">甜蜜相册</view>
-    <view class="ornament enter enter-up d3">❦</view>
-    <view class="photo-masonry">
-      <view
-        class="photo-frame enter {{index % 2 === 0 ? 'enter-left tilt-left' : 'enter-right tilt-right'}} d{{index + 3}}"
-        wx:for="{{wedding.photos}}"
-        wx:key="title"
-      >
-        <image class="photo-img" src="{{item.src}}" mode="aspectFill"></image>
-        <view class="photo-meta">
-          <text class="photo-title">{{item.title}}</text>
-          <text class="photo-desc">{{item.desc}}</text>
+        <view class="hero-landing">
+          <view class="hero-names enter enter-up d3">{{wedding.groom}}<text class="hero-amp"> & </text>{{wedding.bride}}</view>
+          <view class="hero-date enter enter-up d4">{{wedding.solarDate}} · {{wedding.weekDay}} · 农历{{wedding.lunarDate}}</view>
         </view>
+        <view class="scroll-hint">上滑 · 开启请柬</view>
       </view>
-    </view>
-  </view>
+    </swiper-item>
 
-  <!-- ========== 婚礼流程 ========== -->
-  <view class="sec timeline-sheet parchment {{revealed.timeline ? 'reveal' : ''}}" id="sec-timeline">
-    <view class="tl-head enter enter-down d1">
-      <view class="tl-script">Wedding time</view>
-      <view class="tl-date">{{wedding.dateLong}}</view>
-      <view class="tl-lunar">农历：{{wedding.lunarDate}} · {{wedding.weekDay}}</view>
-    </view>
-    <view class="tl-list">
-      <view
-        class="tl-row enter enter-up d{{index + 3}}"
-        wx:for="{{wedding.timeline}}"
-        wx:key="time"
-      >
-        <view class="tl-left">
-          <image class="tl-ic" src="{{item.icon}}" mode="aspectFit"></image>
-          <text class="tl-en">{{item.en}}</text>
-        </view>
-        <view class="tl-line"></view>
-        <view class="tl-right">
-          <view class="tl-time">{{item.time}}</view>
-          <view class="tl-title">{{item.title}}</view>
-          <view class="tl-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 婚礼地点：与流程同页，去掉地图与导航按钮 -->
-    <view class="tl-address enter enter-up d7">
-      <view class="tl-script">Wedding address</view>
-      <view class="tl-venue">{{wedding.venueName}}</view>
-      <view class="tl-hall">{{wedding.venueHall}}</view>
-      <view class="tl-addr">{{wedding.venueAddress}}</view>
-    </view>
-  </view>
-
-  <!-- ========== 祝福留言 ========== -->
-  <view class="sec rsvp-sheet parchment {{revealed.rsvp ? 'reveal' : ''}}" id="sec-rsvp">
-    <view class="latin-tag enter enter-down d1">Blessings</view>
-    <view class="section-title enter enter-down d2">祝福留言</view>
-    <view class="ornament enter enter-up d3">❦</view>
-
-    <view class="rsvp-form enter enter-left d4">
-      <view class="form-item">
-        <input class="form-input" placeholder="您的姓名" value="{{formData.name}}" bindinput="onNameInput" />
-      </view>
-      <view class="form-item">
-        <input class="form-input" placeholder="出席人数" type="number" value="{{formData.count}}" bindinput="onCountInput" />
-      </view>
-      <view class="form-item">
-        <textarea class="form-textarea" placeholder="写下您的祝福..." value="{{formData.message}}" bindinput="onMessageInput"></textarea>
-      </view>
-      <button class="submit-btn" bindtap="submitBlessing">送出祝福</button>
-      <view class="persist-tip" wx:if="{{cloudTip}}">{{cloudTip}}</view>
-    </view>
-
-    <view class="blessing-wall enter enter-right d5">
-      <view class="wall-title">Guest Book</view>
-      <!-- 云端读取中：骨架占位 -->
-      <block wx:if="{{blessingsLoading}}">
-        <view class="blessing-skeleton" wx:for="{{[1, 2]}}" wx:key="*this">
-          <view class="skeleton-line skeleton-name"></view>
-          <view class="skeleton-line"></view>
-        </view>
-      </block>
-      <!-- 空态：邀请留言 -->
-      <view class="blessing-empty" wx:elif="{{blessings.length === 0}}">
-        还没有祝福，来写下第一条吧 ♡
-      </view>
-      <block wx:else>
-        <view class="blessing-item {{item.id === latestBlessingId ? 'blessing-new' : ''}}" wx:for="{{blessings}}" wx:key="id">
-          <view class="blessing-header">
-            <text class="blessing-name">{{item.name}}</text>
-            <text class="blessing-time">{{item.time}}</text>
+    <!-- ========== 第 2 页 · 邀请 ========== -->
+    <swiper-item>
+      <view class="sec invitation-sheet parchment {{revealed.invitation ? 'reveal' : ''}}" id="sec-invitation">
+        <scroll-view
+          class="inner-scroll"
+          id="scroll-invitation"
+          scroll-y
+          enhanced
+          show-scrollbar="{{false}}"
+          upper-threshold="40"
+          lower-threshold="40"
+          data-view="invitation"
+          bindscroll="onInnerScroll"
+          bindscrolltoupper="onInnerReachUpper"
+          bindscrolltolower="onInnerReachLower"
+          bindtouchstart="onInnerTouchStart"
+          bindtouchend="onInnerTouchEnd"
+        >
+          <view class="page-body pb-invitation" id="body-invitation">
+            <view class="invite-headline enter enter-down d1">{{wedding.inviteHeadline}}</view>
+            <view class="invite-photo-wrap enter enter-up d2">
+              <image class="invite-photo" src="{{wedding.inviteImage}}" mode="aspectFill"></image>
+              <view class="invite-photo-fade"></view>
+            </view>
+            <view class="invite-body">
+              <view
+                class="invitation-text enter enter-up d{{index + 3}}"
+                wx:for="{{wedding.inviteLines}}"
+                wx:for-item="line"
+                wx:key="*this"
+              >
+                <text>{{line}}</text>
+              </view>
+            </view>
+            <view class="invite-filler enter enter-up d9">
+              <view class="filler-line" wx:for="{{wedding.inviteFiller}}" wx:key="*this">
+                <text>{{item}}</text>
+              </view>
+            </view>
           </view>
-          <view class="blessing-content">{{item.message}}</view>
-        </view>
-      </block>
-    </view>
+        </scroll-view>
+      </view>
+    </swiper-item>
 
-    <view class="footer-mini enter enter-up d6">
-      <view class="footer-rule"></view>
-      <view class="footer-closing">{{wedding.closing}}</view>
-      <view class="footer-names">{{wedding.groom}} & {{wedding.bride}}</view>
-      <view class="footer-date">{{wedding.solarDate}}</view>
-      <view class="footer-text">With Love</view>
-    </view>
+    <!-- ========== 第 3 页 · 甜蜜相册（页内滚动） ========== -->
+    <swiper-item>
+      <view class="sec photos-sheet parchment {{revealed.photos ? 'reveal' : ''}}" id="sec-photos">
+        <view class="latin-tag enter enter-down d1">Gallery</view>
+        <view class="section-title enter enter-down d2">甜蜜相册</view>
+        <view class="ornament enter enter-up d3">❦</view>
+        <scroll-view
+          class="inner-scroll"
+          id="scroll-gallery"
+          scroll-y
+          enhanced
+          show-scrollbar="{{false}}"
+          upper-threshold="40"
+          lower-threshold="40"
+          data-view="gallery"
+          bindscroll="onInnerScroll"
+          bindscrolltoupper="onInnerReachUpper"
+          bindscrolltolower="onInnerReachLower"
+          bindtouchstart="onInnerTouchStart"
+          bindtouchend="onInnerTouchEnd"
+        >
+          <view class="photo-masonry" id="body-gallery">
+            <view
+              class="photo-frame enter {{index % 2 === 0 ? 'enter-left tilt-left' : 'enter-right tilt-right'}} d{{index + 3}}"
+              wx:for="{{wedding.photos}}"
+              wx:key="title"
+            >
+              <image class="photo-img" src="{{item.src}}" mode="aspectFill"></image>
+              <view class="photo-meta">
+                <text class="photo-title">{{item.title}}</text>
+                <text class="photo-desc">{{item.desc}}</text>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </swiper-item>
+
+    <!-- ========== 第 4 页 · 婚礼流程 + 婚礼地点 ========== -->
+    <swiper-item>
+      <view class="sec timeline-sheet parchment {{revealed.timeline ? 'reveal' : ''}}" id="sec-timeline">
+        <scroll-view
+          class="inner-scroll"
+          id="scroll-timeline"
+          scroll-y
+          enhanced
+          show-scrollbar="{{false}}"
+          upper-threshold="40"
+          lower-threshold="40"
+          data-view="timeline"
+          bindscroll="onInnerScroll"
+          bindscrolltoupper="onInnerReachUpper"
+          bindscrolltolower="onInnerReachLower"
+          bindtouchstart="onInnerTouchStart"
+          bindtouchend="onInnerTouchEnd"
+        >
+          <view class="page-body pb-timeline" id="body-timeline">
+            <view class="tl-head enter enter-down d1">
+              <view class="tl-script">Wedding time</view>
+              <view class="tl-date">{{wedding.dateLong}}</view>
+              <view class="tl-lunar">农历：{{wedding.lunarDate}} · {{wedding.weekDay}}</view>
+            </view>
+            <view class="tl-list">
+              <view
+                class="tl-row enter enter-up d{{index + 3}}"
+                wx:for="{{wedding.timeline}}"
+                wx:key="time"
+              >
+                <view class="tl-left">
+                  <image class="tl-ic" src="{{item.icon}}" mode="aspectFit"></image>
+                  <text class="tl-en">{{item.en}}</text>
+                </view>
+                <view class="tl-line"></view>
+                <view class="tl-right">
+                  <view class="tl-time">{{item.time}}</view>
+                  <view class="tl-title">{{item.title}}</view>
+                  <view class="tl-desc" wx:if="{{item.desc}}">{{item.desc}}</view>
+                </view>
+              </view>
+            </view>
+
+            <!-- 婚礼地点：与流程同页，去掉地图与导航按钮 -->
+            <view class="tl-address enter enter-up d7">
+              <view class="tl-script">Wedding address</view>
+              <view class="tl-venue">{{wedding.venueName}}</view>
+              <view class="tl-hall">{{wedding.venueHall}}</view>
+              <view class="tl-addr">{{wedding.venueAddress}}</view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </swiper-item>
+
+    <!-- ========== 第 5 页 · 祝福留言 ========== -->
+    <swiper-item>
+      <view class="sec rsvp-sheet parchment {{revealed.rsvp ? 'reveal' : ''}}" id="sec-rsvp">
+        <view class="latin-tag enter enter-down d1">Blessings</view>
+        <view class="section-title enter enter-down d2">祝福留言</view>
+        <view class="ornament enter enter-up d3">❦</view>
+
+        <view class="rsvp-form enter enter-left d4">
+          <view class="form-item">
+            <input class="form-input" placeholder="您的姓名" value="{{formData.name}}" bindinput="onNameInput" />
+          </view>
+          <view class="form-item">
+            <input class="form-input" placeholder="出席人数" type="number" value="{{formData.count}}" bindinput="onCountInput" />
+          </view>
+          <view class="form-item">
+            <textarea class="form-textarea" placeholder="写下您的祝福..." value="{{formData.message}}" bindinput="onMessageInput"></textarea>
+          </view>
+          <button class="submit-btn" bindtap="submitBlessing">送出祝福</button>
+          <view class="persist-tip" wx:if="{{cloudTip}}">{{cloudTip}}</view>
+        </view>
+
+        <view class="blessing-wall enter enter-right d5">
+          <view class="wall-title">Guest Book</view>
+          <scroll-view
+            class="inner-scroll blessing-wall-scroll"
+            id="scroll-wall"
+            scroll-y
+            enhanced
+            show-scrollbar="{{false}}"
+            upper-threshold="40"
+            lower-threshold="40"
+            data-view="wall"
+            bindscroll="onInnerScroll"
+            bindscrolltoupper="onInnerReachUpper"
+            bindscrolltolower="onInnerReachLower"
+            bindtouchstart="onInnerTouchStart"
+            bindtouchend="onInnerTouchEnd"
+          >
+            <view id="body-wall">
+              <!-- 云端读取中：骨架占位 -->
+              <block wx:if="{{blessingsLoading}}">
+                <view class="blessing-skeleton" wx:for="{{[1, 2]}}" wx:key="*this">
+                  <view class="skeleton-line skeleton-name"></view>
+                  <view class="skeleton-line"></view>
+                </view>
+              </block>
+              <!-- 空态：邀请留言 -->
+              <view class="blessing-empty" wx:elif="{{blessings.length === 0}}">
+                还没有祝福，来写下第一条吧 ♡
+              </view>
+              <block wx:else>
+                <view class="blessing-item {{item.id === latestBlessingId ? 'blessing-new' : ''}}" wx:for="{{blessings}}" wx:key="id">
+                  <view class="blessing-header">
+                    <text class="blessing-name">{{item.name}}</text>
+                    <text class="blessing-time">{{item.time}}</text>
+                  </view>
+                  <view class="blessing-content">{{item.message}}</view>
+                </view>
+              </block>
+            </view>
+          </scroll-view>
+        </view>
+
+        <view class="footer-mini enter enter-up d6">
+          <view class="footer-rule"></view>
+          <view class="footer-closing">{{wedding.closing}}</view>
+          <view class="footer-names">{{wedding.groom}} & {{wedding.bride}}</view>
+          <view class="footer-date">{{wedding.solarDate}}</view>
+          <view class="footer-text">With Love</view>
+        </view>
+
+        <!-- 分享引导：转发与朋友圈均从右上角菜单进入 -->
+        <view class="share-tip enter enter-up d7">分享请柬 · 点右上角「···」转发给亲友或分享到朋友圈</view>
+      </view>
+    </swiper-item>
+
+  </swiper>
+
+  <!-- 右侧页码指示点：点击直达对应页 -->
+  <view class="page-dots">
+    <view
+      class="page-dot {{current === index ? 'active' : ''}}"
+      wx:for="{{[0, 1, 2, 3, 4]}}"
+      wx:key="*this"
+      data-i="{{index}}"
+      bindtap="onTapDot"
+    ></view>
   </view>
 
 </view>
