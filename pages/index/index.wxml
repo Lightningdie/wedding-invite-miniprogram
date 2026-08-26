@@ -116,18 +116,38 @@
           bindtouchstart="onInnerTouchStart"
           bindtouchend="onInnerTouchEnd"
         >
-          <view class="photo-masonry" id="body-gallery">
-            <view
-              class="photo-frame enter {{index % 2 === 0 ? 'enter-left tilt-left' : 'enter-right tilt-right'}} d{{index + 3}}"
-              wx:for="{{wedding.photos}}"
-              wx:key="title"
-            >
-              <image class="photo-img" src="{{item.src}}" mode="aspectFill"></image>
-              <view class="photo-meta">
-                <text class="photo-title">{{item.title}}</text>
-                <text class="photo-desc">{{item.desc}}</text>
-              </view>
+          <!-- 竖向胶片：齿孔在两侧，画面缓慢连续上滑（无缝循环），手指可上下拨动，松手继续 -->
+          <view class="film-roll enter enter-up d4" id="body-gallery">
+            <view class="film-perf film-perf-left"></view>
+            <view class="film-window">
+              <!-- 原生竖向 swiper：autoplay+linear 匀速连续上滑；next-margin 露出下一张顶部；
+                   内层竖滑原生压制外层整页翻页；手动可拨，触摸时暂停自动、松手 3 秒后恢复 -->
+              <swiper
+                class="film-swiper"
+                vertical="{{true}}"
+                circular="{{true}}"
+                autoplay="{{filmAutoplay}}"
+                interval="3900"
+                duration="3800"
+                easing-function="linear"
+                next-margin="330rpx"
+                bindtouchstart="onFilmTouchStart"
+                bindtouchend="onFilmTouchEnd"
+              >
+                <swiper-item wx:for="{{wedding.photos}}" wx:key="title">
+                  <view class="film-cell">
+                    <view class="film-photo">
+                      <image class="film-img" src="{{item.src}}" mode="aspectFill"></image>
+                      <view class="film-vignette"></view>
+                      <view class="film-frame-no">No.{{index + 1 < 10 ? '0' : ''}}{{index + 1}}</view>
+                    </view>
+                  </view>
+                </swiper-item>
+              </swiper>
+              <view class="film-shade film-shade-top"></view>
+              <view class="film-shade film-shade-bottom"></view>
             </view>
+            <view class="film-perf film-perf-right"></view>
           </view>
         </scroll-view>
       </view>

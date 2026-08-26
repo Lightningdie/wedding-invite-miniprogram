@@ -23,8 +23,7 @@
   background: transparent !important;
 }
 
-.hide-scrollbar,
-.photo-masonry {
+.hide-scrollbar {
   scrollbar-width: none;
 }
 
@@ -473,67 +472,112 @@
   letter-spacing: 1rpx;
 }
 
-/* ========== 甜蜜相册 ========== */
-.photo-masonry {
-  width: 100%;
+/* ========== 甜蜜相册 · 竖向胶片 ========== */
+/* 胶卷：深色片壳 + 左右两列齿孔，画面竖排缓慢连续上滑（无缝循环），手指可上下拨动 */
+.film-roll {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 44rpx;
-  padding: 8rpx 4rpx 24rpx;
-}
-
-.photo-frame {
-  width: 86%;
-  background: #fff;
-  padding: 16rpx 16rpx 28rpx;
-  box-shadow: 0 10rpx 28rpx rgba(70, 45, 20, 0.14);
-}
-
-.tilt-left { align-self: flex-start; }
-.tilt-right { align-self: flex-end; }
-
-.reveal .tilt-left.enter-left {
-  animation: slideInLeftTilt 1.3s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-.reveal .tilt-right.enter-right {
-  animation: slideInRightTilt 1.3s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-@keyframes slideInLeftTilt {
-  from { opacity: 0; transform: translateX(-80rpx) rotate(-1.5deg); }
-  to { opacity: 1; transform: translateX(0) rotate(-1.5deg); }
-}
-
-@keyframes slideInRightTilt {
-  from { opacity: 0; transform: translateX(80rpx) rotate(1.8deg); }
-  to { opacity: 1; transform: translateX(0) rotate(1.8deg); }
-}
-
-.photo-img {
+  align-items: stretch;
   width: 100%;
-  height: 360rpx;
-  display: block;
-  filter: sepia(12%);
+  box-sizing: border-box;
+  background: linear-gradient(150deg, #2B251D 0%, #221D16 55%, #191510 100%);
+  border-radius: 14rpx;
+  padding: 24rpx 0;
+  box-shadow:
+    0 18rpx 44rpx rgba(60, 42, 22, 0.32),
+    inset 0 0 0 1rpx rgba(255, 244, 220, 0.07);
 }
 
-.photo-meta {
-  margin-top: 18rpx;
-  padding: 0 8rpx;
+/* 齿孔条：左右两列圆形小孔透出页面底色 */
+.film-perf {
+  width: 44rpx;
+  flex-shrink: 0;
+  background-image: radial-gradient(circle 10rpx at 50% 50%, #F5EEDF 97%, transparent 100%);
+  background-size: 44rpx 40rpx;
+  background-repeat: repeat-y;
+  background-position: center;
 }
 
-.photo-title {
-  display: block;
+/* 画面窗口：竖向片门，高度固定，超出裁掉 */
+.film-window {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 1100rpx;
+  margin: 0 10rpx;
+  background: #0D0A07;
+  overflow: hidden;
+  border-radius: 4rpx;
+}
+
+/* 胶片放映窗：原生竖向 swiper 匀速连续上滑；next-margin=330rpx 露出下一张顶部（窗口 1100 - 330 = 可视 770） */
+.film-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+/* 单格画面：占满可视区，上下留胶片间隔 */
+.film-cell {
+  height: 770rpx;
+  padding: 0 14rpx;
+  box-sizing: border-box;
+}
+
+.film-photo {
+  position: relative;
+  height: 740rpx;
+  margin: 15rpx 0;
+  overflow: hidden;
+  background: #171310;
+}
+
+/* 暖调泛黄 + 轻微降饱和：旧胶片色彩 */
+.film-img {
+  width: 100%;
+  height: 100%;
+  filter: sepia(16%) saturate(0.92) contrast(1.05);
+}
+
+/* 四角压暗：镜头暗角 */
+.film-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 56%, rgba(16, 12, 7, 0.34) 100%);
+  pointer-events: none;
+}
+
+/* 帧号：右下角小刻字 */
+.film-frame-no {
+  position: absolute;
+  right: 18rpx;
+  bottom: 12rpx;
   font-family: Georgia, serif;
-  font-size: 30rpx;
-  color: #5C4030;
   font-style: italic;
+  font-size: 20rpx;
+  letter-spacing: 3rpx;
+  color: rgba(244, 234, 210, 0.82);
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.65);
+  pointer-events: none;
 }
 
-.photo-desc {
-  display: block;
-  margin-top: 6rpx;
-  font-size: 22rpx;
-  color: #9A8068;
+/* 上下渐隐：胶片出入片门的暗角 */
+.film-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 90rpx;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.film-shade-top {
+  top: 0;
+  background: linear-gradient(180deg, rgba(13, 10, 7, 0.92) 0%, transparent 100%);
+}
+
+.film-shade-bottom {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(13, 10, 7, 0.92) 0%, transparent 100%);
 }
 
 /* ========== 婚礼流程 + 婚礼地点（同页 · 左条目/竖线/右时间 分栏式） ========== */

@@ -70,6 +70,13 @@ function mergeWedding(saved) {
   // 地图导航功能已移除，清理旧配置里遗留的经纬度
   delete merged.latitude
   delete merged.longitude
+  // 旧版 unsplash 占位照片已被本地照片（assets/images/photoes）取代，检测到外链即整体换回默认
+  if (
+    Array.isArray(merged.photos) &&
+    merged.photos.some((p) => p && typeof p.src === 'string' && p.src.indexOf('images.unsplash.com') > -1)
+  ) {
+    merged.photos = DEFAULT_WEDDING.photos
+  }
   // 旧配置的流程条目没有英文名（en）和图标（icon），按序号回填默认值，保证左右分栏排版完整
   if (Array.isArray(merged.timeline)) {
     merged.timeline = merged.timeline.map((item, i) => {

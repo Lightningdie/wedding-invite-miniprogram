@@ -26,6 +26,8 @@ Page({
     musicOn: false,
     cloudTip: '',
     current: 0,
+    // 竖向胶片：原生竖向 swiper 匀速连续上滑，触摸时暂停自动播放、松手后恢复
+    filmAutoplay: false,
     // 翻到某页后点亮该页入场动画，离开时复位以便下次重放
     revealed: {
       hero: true,
@@ -38,6 +40,7 @@ Page({
 
   countdownTimer: null,
   _revealTimer: null,
+  _filmTimer: null,
   _edges: {},
 
   onLoad() {
@@ -55,6 +58,9 @@ Page({
     }
     if (this._revealTimer) {
       clearTimeout(this._revealTimer)
+    }
+    if (this._filmTimer) {
+      clearTimeout(this._filmTimer)
     }
   },
 
@@ -80,6 +86,15 @@ Page({
       revealed[key] = false
     })
     this.setData({ current, revealed })
+    // 离开相册页停住胶片自动播放，回到该页恢复
+    if (current !== 2) {
+      this.clearFilmTimer()
+      if (this.data.filmAutoplay) {
+        this.setData({ filmAutoplay: false })
+      }
+    } else if (!this.data.filmAutoplay) {
+      this.setData({ filmAutoplay: true })
+    }
     this._revealTimer = setTimeout(() => {
       this.setData({ ['revealed.' + PAGE_KEYS[current]]: true })
       this.syncEdges(PAGE_SCROLL_KEYS[current] || '')
@@ -95,6 +110,31 @@ Page({
 
   onTapDot(e) {
     this.goPage(Number(e.currentTarget.dataset.i))
+  },
+
+  // —— 胶片轮播：匀速爬行/手动拨动/压制外层翻页都由原生竖向 swiper 保证，这里只管触摸暂停 ——
+  clearFilmTimer() {
+    if (this._filmTimer) {
+      clearTimeout(this._filmTimer)
+      this._filmTimer = null
+    }
+  },
+
+  onFilmTouchStart() {
+    this.clearFilmTimer()
+    if (this.data.filmAutoplay) {
+      this.setData({ filmAutoplay: false })
+    }
+  },
+
+  onFilmTouchEnd() {
+    this.clearFilmTimer()
+    this._filmTimer = setTimeout(() => {
+      this._filmTimer = null
+      if (this.data.current === 2) {
+        this.setData({ filmAutoplay: true })
+      }
+    }, 3000)
   },
 
   // —— 页内滚动与整页翻页的手势衔接：滚到顶/底后再继续滑动即翻页 ——

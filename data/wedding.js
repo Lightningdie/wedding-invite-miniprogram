@@ -40,36 +40,14 @@ const DEFAULT_WEDDING = {
     { time: '11:00', en: 'Photos', icon: '/assets/images/icons/icon-photos.png', title: '合影留念', desc: '与新人合影，记录美好瞬间' }
   ],
   photos: [
-    {
-      src: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80',
-      title: '初次相遇',
-      desc: '那一刻的心动，是故事的开始'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=80',
-      title: '甜蜜日常',
-      desc: '平凡日子里的小确幸'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80',
-      title: '携手同行',
-      desc: '一路相伴，走过春夏秋冬'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80',
-      title: '共度余生',
-      desc: '从此刻起，执子之手与子偕老'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1529636798458-92182e662485?w=600&q=80',
-      title: '约定一生',
-      desc: '把最美的风景留给彼此'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=80',
-      title: '幸福将至',
-      desc: '期待与你并肩走向礼堂'
-    }
+    { src: '/assets/images/photoes/1.jpg', title: '初次相遇', desc: '那一刻的心动，是故事的开始' },
+    { src: '/assets/images/photoes/2.jpg', title: '甜蜜日常', desc: '平凡日子里的小确幸' },
+    { src: '/assets/images/photoes/3.jpg', title: '携手同行', desc: '一路相伴，走过春夏秋冬' },
+    { src: '/assets/images/photoes/4.jpg', title: '共度余生', desc: '从此刻起，执子之手与子偕老' },
+    { src: '/assets/images/photoes/5.jpg', title: '约定一生', desc: '把最美的风景留给彼此' },
+    { src: '/assets/images/photoes/6.jpg', title: '幸福将至', desc: '期待与你并肩走向礼堂' },
+    { src: '/assets/images/photoes/7.jpg', title: '心动时刻', desc: '每个瞬间都值得珍藏' },
+    { src: '/assets/images/photoes/8.jpg', title: '爱的旅程', desc: '往后余生，请多指教' }
   ],
   stories: [
     {
