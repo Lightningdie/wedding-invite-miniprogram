@@ -117,7 +117,16 @@
           bindtouchend="onInnerTouchEnd"
         >
           <!-- 竖向胶片：齿孔在两侧，画面缓慢连续上滑（无缝循环），手指可上下拨动，松手继续 -->
-          <view class="film-roll enter enter-up d4" id="body-gallery">
+          <!-- catch 四类触摸事件：内层胶片 swiper 先自行处理手势，事件在此截住不再外冒，
+               外层整页 swiper 与页内滚动区的边缘翻页逻辑都不会被触发 -->
+          <view
+            class="film-roll enter enter-up d4"
+            id="body-gallery"
+            catchtouchstart="noop"
+            catchtouchmove="noop"
+            catchtouchend="noop"
+            catchtouchcancel="noop"
+          >
             <view class="film-perf film-perf-left"></view>
             <view class="film-window">
               <!-- 原生竖向 swiper：autoplay+linear 匀速连续上滑；next-margin 露出下一张顶部；

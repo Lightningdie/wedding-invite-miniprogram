@@ -113,6 +113,9 @@ Page({
   },
 
   // —— 胶片轮播：匀速爬行/手动拨动/压制外层翻页都由原生竖向 swiper 保证，这里只管触摸暂停 ——
+  // 胶片区 catch 触摸事件用：内层 swiper 已消化手势，此处截断冒泡，阻止外层整页翻页
+  noop() {},
+
   clearFilmTimer() {
     if (this._filmTimer) {
       clearTimeout(this._filmTimer)
