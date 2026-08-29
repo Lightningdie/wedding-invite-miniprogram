@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>囍 刘浩宇 & 张婧怡 · 婚礼请柬</title>
+  <!-- 中文书法字体（楷书/行书）：联网加载，离线回退本地楷体/衬线 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* 正方形卡片边长：随视口等比缩放，超宽屏封顶 880px */
+      --card: min(94vmin, 880px);
+      --gold-1: #f6e6b4;
+      --gold-2: #e2bd72;
+      --gold-3: #c49a52;
+      --gold-text: #e9cd8f;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 2vmin;
+      background: radial-gradient(circle at 50% 38%, #8d2030 0%, #6a131a 55%, #500b12 100%);
+      font-family: 'KaiTi', 'Kaiti SC', 'STKaiti', '楷体', 'Songti SC', serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== 卡片整体：正方形，左照片 / 右喜帖 ===== */
+    .invite {
+      position: relative;
+      display: flex;
+      width: var(--card);
+      height: var(--card);
+      border-radius: calc(var(--card) * .012);
+      overflow: hidden;
+      box-shadow:
+        0 calc(var(--card) * .05) calc(var(--card) * .1) rgba(0, 0, 0, .55),
+        0 0 0 1px rgba(233, 205, 143, .28);
+    }
+
+    /* 整卡外围金色发丝线（同时框住照片与喜帖） */
+    .invite::after {
+      content: '';
+      position: absolute;
+      inset: calc(var(--card) * .014);
+      border: 1px solid rgba(233, 205, 143, .5);
+      border-radius: calc(var(--card) * .008);
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    /* ===== 左侧 · 照片面板 ===== */
+    .left-panel {
+      position: relative;
+      width: 43%;
+      height: 100%;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 底部压暗渐变，与右侧深红自然衔接 */
+    .shade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg,
+          rgba(60, 10, 14, .22) 0%,
+          rgba(90, 16, 22, 0) 30%,
+          rgba(120, 26, 33, .55) 66%,
+          #811c27 100%);
+      z-index: 1;
+    }
+
+    .caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: calc(var(--card) * .06);
+      z-index: 2;
+      text-align: center;
+    }
+
+    .caption-row {
+      display: inline-flex;
+      align-items: center;
+      gap: calc(var(--card) * .02);
+    }
+
+    /* 红色印章 · 囍结良缘（四字田字格，右起直读） */
+    .seal {
+      width: calc(var(--card) * .06);
+      height: calc(var(--card) * .06);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      place-items: center;
+      padding: calc(var(--card) * .005);
+      background: #c3272b;
+      border: 1px solid rgba(233, 205, 143, .85);
+      border-radius: calc(var(--card) * .007);
+      color: #f7e7c3;
+      font-size: calc(var(--card) * .0195);
+      line-height: 1.1;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+      transform: translateY(calc(var(--card) * -.012));
+    }
+
+    .seal i {
+      font-style: normal;
+    }
+
+    /* 吾家有喜 · 毛笔楷书 */
+    .calligraphy {
+      font-family: 'Ma Shan Zheng', 'Zhi Mang Xing',
+        'KaiTi', 'Kaiti SC', 'STKaiti', '楷体', serif;
+      font-size: calc(var(--card) * .076);
+      line-height: 1.15;
+      letter-spacing: .06em;
+      background: linear-gradient(170deg, var(--gold-1) 8%, var(--gold-2) 55%, var(--gold-3) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .4));
+    }
+
+    .caption-en {
+      margin-top: calc(var(--card) * .018);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: calc(var(--card) * .0195);
+      letter-spacing: .42em;
+      text-indent: .42em;
+      /* 抵消末字间距，保持视觉居中 */
+      color: rgba(255, 250, 240, .88);
+    }
+
+    /* ===== 右侧 · 喜帖文字面板 ===== */
+    .right-panel {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: calc(var(--card) * .03) calc(var(--card) * .04) calc(var(--card) * .02);
+      background:
+        radial-gradient(circle at 85% 10%, rgba(233, 205, 143, .10), transparent 46%),
+        radial-gradient(circle at 12% 90%, rgba(233, 205, 143, .08), transparent 42%),
+        linear-gradient(180deg, #8f1f2a 0%, #811c27 55%, #731923 100%);
+    }
+
+    /* 背景淡囍水印 */
+    .right-panel::before {
+      content: '囍';
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      transform: translate(-50%, -50%);
+      font-size: calc(var(--card) * .6);
+      line-height: 1;
+      color: rgba(233, 205, 143, .045);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 双线鎏金内框 + 四角金点 */
+    .frame {
+      position: absolute;
+      inset: calc(var(--card) * .02);
+      border: 1px solid rgba(233, 205, 143, .5);
+      background:
+        radial-gradient(circle at 0 0, var(--gold-2) 0 2.5px, transparent 3.5px),
+        radial-gradient(circle at 100% 0, var(--gold-2) 0 2.5px, transparent 3.5px),
+        radial-gradient(circle at 0 100%, var(--gold-2) 0 2.5px, transparent 3.5px),
+        radial-gradient(circle at 100% 100%, var(--gold-2) 0 2.5px, transparent 3.5px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .frame::after {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(233, 205, 143, .22);
+    }
+
+    /* 顶部大号囍字 · 行书 */
+    .xi {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: calc(var(--card) * .015);
+    }
+
+    .xi-char {
+      font-family: 'Zhi Mang Xing', 'Ma Shan Zheng',
+        'KaiTi', 'Kaiti SC', 'STKaiti', '楷体', serif;
+      font-size: calc(var(--card) * .102);
+      line-height: 1.05;
+      background: linear-gradient(165deg, var(--gold-1) 5%, #dcb56a 52%, #b98f4a 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .3));
+    }
+
+    .xi-divider {
+      position: relative;
+      width: calc(var(--card) * .22);
+      height: 1px;
+      margin-top: calc(var(--card) * .014);
+      background: linear-gradient(90deg, transparent, rgba(233, 205, 143, .9), transparent);
+    }
+
+    .xi-divider::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: calc(var(--card) * .012);
+      height: calc(var(--card) * .012);
+      transform: translate(-50%, -50%) rotate(45deg);
+      background: var(--gold-2);
+    }
+
+    /* 喜帖正文：字号随卡片等比缩放，小屏保底 11px */
+    .body {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: var(--gold-text);
+      font-size: max(10px, calc(var(--card) * .025));
+      line-height: 1.95;
+      letter-spacing: .1em;
+    }
+
+    .greet {
+      font-size: 1.3em;
+      letter-spacing: .36em;
+      text-indent: .36em;
+      color: #f2dda6;
+      margin-bottom: .6em;
+    }
+
+    .strong {
+      color: #f4e0a8;
+    }
+
+    .host {
+      margin-top: .9em;
+      font-size: 1.04em;
+      color: #f2dda6;
+    }
+
+    .closing {
+      margin-top: .25em;
+      letter-spacing: .48em;
+      text-indent: .48em;
+      color: #f2dda6;
+      padding-bottom: calc(var(--card) * .01);
+    }
+
+    /* 正文三段之间的分割线：渐隐金线 + 中央菱形 */
+    .body-divider {
+      position: relative;
+      width: 62%;
+      height: 1px;
+      margin: calc(var(--card) * .019) 0;
+      background: linear-gradient(90deg, transparent, rgba(233, 205, 143, .75), transparent);
+    }
+
+    .body-divider::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: calc(var(--card) * .009);
+      height: calc(var(--card) * .009);
+      transform: translate(-50%, -50%) rotate(45deg);
+      background: var(--gold-2);
+    }
+  </style>
+</head>
+
+<body>
+  <main class="invite">
+
+    <!-- 左侧 · 新人照片 -->
+    <section class="left-panel">
+      <img class="photo" src="assets/images/photoes/1111.jpg" alt="刘浩宇与张婧怡合照">
+      <div class="shade"></div>
+      <div class="caption">
+        <div class="caption-row">
+          <span class="seal"><i>良</i><i>囍</i><i>缘</i><i>结</i></span>
+          <span class="calligraphy">吾家有喜</span>
+        </div>
+        <div class="caption-en">WEDDING INVITATION</div>
+      </div>
+    </section>
+
+    <!-- 右侧 · 喜帖正文 -->
+    <section class="right-panel">
+      <div class="frame"></div>
+
+      <div class="xi">
+        <div class="xi-char">囍</div>
+        <div class="xi-divider"></div>
+      </div>
+
+      <div class="body">
+        <p class="greet">各位亲朋好友</p>
+        <p>谨定于2026年9月29日</p>
+        <p>(农历八月十九)星期二</p>
+        <p class="strong">儿子 刘浩宇 & 儿媳 张婧怡</p>
+        <p>在 盐山县宾馆 举行婚礼</p>
+        <div class="body-divider"></div>
+        <p>盐山平津北大街健晟星期天南100米设家宴</p>
+        <p>9月28日午备大锅菜晚备扣碗</p>
+        <p>9月29日 早6:00备喜饺</p>
+        <div class="body-divider"></div>
+        <p>盐山县宾馆敬备结婚喜筵</p>
+        <p>9月29日 上午10:00</p>
+        <p class="host">刘海燕 王宏伟夫妇 敬邀</p>
+        <p class="closing">恭候光临</p>
+      </div>
+    </section>
+
+  </main>
+</body>
+
+</html>

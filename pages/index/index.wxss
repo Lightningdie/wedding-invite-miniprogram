@@ -31,12 +31,7 @@
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  /* 整页一整条连续渐变 + 多层柔光：白偏黄基调，既有层次又无接缝色差 */
-  background:
-    radial-gradient(circle at 20% 8%, rgba(255, 253, 248, 0.55), transparent 36%),
-    radial-gradient(circle at 82% 46%, rgba(214, 190, 150, 0.12), transparent 42%),
-    radial-gradient(circle at 26% 82%, rgba(255, 253, 248, 0.4), transparent 40%),
-    linear-gradient(176deg, #FBF7EE 0%, #F9F3E6 16%, #F7F0E1 55%, #F4EBDA 100%);
+  background: #FAF5EC;
   position: relative;
 }
 
@@ -108,6 +103,7 @@
 .d9 { animation-delay: 1.09s !important; }
 .d10 { animation-delay: 1.22s !important; }
 
+
 @keyframes slideInLeft {
   from { opacity: 0; transform: translateX(-80rpx); }
   to { opacity: 1; transform: translateX(0); }
@@ -130,10 +126,11 @@
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 22rpx;
   letter-spacing: 10rpx;
+  padding-top: 20px;
   text-transform: uppercase;
   color: #A67C52;
   align-self: center;
-  margin-bottom: 14rpx;
+  margin-bottom: 10rpx;
   font-style: italic;
 }
 
@@ -143,7 +140,7 @@
   color: #5C4030;
   letter-spacing: 8rpx;
   font-weight: 400;
-  margin-bottom: 8rpx;
+  margin-bottom: 0rpx;
   align-self: center;
   text-align: center;
 }
@@ -257,15 +254,16 @@
   flex-direction: column;
   align-items: center;
   padding: 0 30rpx;
-  padding-top: 24vh;
+  padding-top: 17vh;
   text-align: center;
 }
 
 /* 手写体 We got married（白色，Alex Brush —— 简洁版花体） */
 .hero-script {
   font-family: 'AlexBrush', 'Snell Roundhand', 'Brush Script MT', cursive;
-  font-size: 100rpx;
-  line-height: 1.35;
+  font-size: 120rpx;
+  margin-bottom: 10px;
+  line-height: 1.85;
   color: #FFFFFF;
   letter-spacing: 0;
   text-shadow: 0 2rpx 22rpx rgba(70, 50, 30, 0.42), 0 0 2rpx rgba(70, 50, 30, 0.3);
@@ -340,7 +338,7 @@
 
 .hero-names {
   font-family: 'Kaiti SC', 'STKaiti', 'KaiTi', '楷体', 'DFKai-SB', Georgia, serif;
-  font-size: 56rpx;
+  font-size: 50rpx;
   font-weight: 400;
   color: #241E17;
   letter-spacing: 6rpx;
@@ -395,14 +393,16 @@
 
 /* 第一行：英文标题（Alex Brush 简洁手写体，缩到一行内） */
 .invite-headline {
-  margin: 0 0 36rpx;
+  padding-top: 20px;
+  margin-bottom: 10px;
   align-self: center;
   text-align: center;
   white-space: nowrap;
+  font-weight: 500;
   font-family: 'AlexBrush', 'Snell Roundhand', 'Brush Script MT', cursive;
-  font-size: 44rpx;
+  font-size: 50rpx;
   line-height: 1.4;
-  color: #4A3A2C;
+  color: #5e0e0e;
   letter-spacing: 0;
 }
 
@@ -420,7 +420,8 @@
   width: 100%;
   height: 36vh;
   min-height: 300rpx;
-  margin: 0;
+  margin-bottom: 10rpx;
+  padding-bottom: 15rpx;
   overflow: hidden;
 }
 
@@ -480,22 +481,24 @@
   align-items: stretch;
   width: 100%;
   box-sizing: border-box;
-  background: linear-gradient(150deg, #2B251D 0%, #221D16 55%, #191510 100%);
+  background: linear-gradient(150deg, #3A332A 0%, #302A21 55%, #262019 100%);
   border-radius: 14rpx;
   padding: 24rpx 0;
   box-shadow:
-    0 18rpx 44rpx rgba(60, 42, 22, 0.32),
-    inset 0 0 0 1rpx rgba(255, 244, 220, 0.07);
+    0 18rpx 44rpx rgba(60, 42, 22, 0.28),
+    inset 0 0 20rpx 8rpx rgba(255, 244, 220, 0.05);
 }
 
 /* 齿孔条：左右两列圆形小孔透出页面底色 */
 .film-perf {
-  width: 44rpx;
+  width: 32rpx;
   flex-shrink: 0;
-  background-image: radial-gradient(circle 10rpx at 50% 50%, #F5EEDF 97%, transparent 100%);
-  background-size: 44rpx 40rpx;
+  background-image: radial-gradient(circle 8rpx at 50% 50%, rgba(245, 238, 223, 0.92) 72%, rgba(245, 238, 223, 0.3) 96%, transparent 100%);
+  background-size: 32rpx 40rpx;
   background-repeat: repeat-y;
   background-position: center;
+  /* 齿孔边缘晕开，更朦胧 */
+  filter: blur(1px);
 }
 
 /* 画面窗口：竖向片门，高度固定，超出裁掉 */
@@ -504,10 +507,22 @@
   flex: 1;
   min-width: 0;
   height: 1100rpx;
-  margin: 0 10rpx;
-  background: #0D0A07;
+  margin: 0 8rpx;
+  background: #14100B;
   overflow: hidden;
   border-radius: 4rpx;
+}
+
+/* 两侧渐隐：片壳色向画面一侧朦胧过渡，照片边缘融进胶卷 */
+.film-window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(58, 51, 42, 0.42) 0%, transparent 16%),
+    linear-gradient(270deg, rgba(58, 51, 42, 0.42) 0%, transparent 16%);
+  pointer-events: none;
+  z-index: 3;
 }
 
 /* 胶片放映窗：原生竖向 swiper 匀速连续上滑；next-margin=330rpx 露出下一张顶部（窗口 1100 - 330 = 可视 770） */
@@ -525,10 +540,10 @@
 
 .film-photo {
   position: relative;
-  height: 740rpx;
-  margin: 15rpx 0;
+  height: 754rpx;
+  margin: 8rpx 0;
   overflow: hidden;
-  background: #171310;
+  background: #201A14;
 }
 
 /* 暖调泛黄 + 轻微降饱和：旧胶片色彩 */
@@ -572,12 +587,12 @@
 
 .film-shade-top {
   top: 0;
-  background: linear-gradient(180deg, rgba(13, 10, 7, 0.92) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(20, 16, 11, 0.92) 0%, transparent 100%);
 }
 
 .film-shade-bottom {
   bottom: 0;
-  background: linear-gradient(0deg, rgba(13, 10, 7, 0.92) 0%, transparent 100%);
+  background: linear-gradient(0deg, rgba(20, 16, 11, 0.92) 0%, transparent 100%);
 }
 
 /* ========== 婚礼流程 + 婚礼地点（同页 · 左条目/竖线/右时间 分栏式） ========== */
@@ -847,8 +862,6 @@
 /* 落款 */
 .footer-mini {
   text-align: center;
-  padding: 24rpx 0 0;
-  margin-top: 16rpx;
 }
 
 .footer-rule {
@@ -898,10 +911,80 @@
   letter-spacing: 2rpx;
 }
 
+/* ========== 红色线条插画装饰（透明底 PNG，尺寸按原图宽高比） ========== */
+/* 邀请页：囍·小猫抬花束 —— 花体标题下的喜庆徽记（513x486） */
+.deco-cats {
+  display: block;
+  width: 190rpx;
+  height: 180rpx;
+  margin: 0 auto 24rpx;
+}
+
+/* 邀请页右下角：玫瑰花束，飘带垂角（420x594） */
+.deco-bouquet {
+  position: absolute;
+  right: 8rpx;
+  bottom: 34rpx;
+  width: 140rpx;
+  height: 198rpx;
+  pointer-events: none;
+}
+
+.deco-rose {
+  display: block;
+  position: absolute;
+  bottom: 600rpx;
+  width: 140rpx;
+  left: -10px;
+  height: 190rpx;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 相册页右上角：复古 Wedding 手账，呼应 Gallery 主题（477x523） */
+.deco-book {
+  display: block;
+  position: absolute;
+  top: 90rpx;
+  right: 210rpx;
+  width: 90rpx;
+  height: 80rpx;
+  pointer-events: none;
+  z-index: 2;
+}
+.deco-propose {
+  display: block;
+  position: absolute;
+  top: 110rpx;
+  left: 10rpx;
+  width: 300rpx;
+  height: 300rpx;
+  pointer-events: none;
+  z-index: 2;
+}
+/* 流程页：蛋糕与交杯酒 —— 流程列表与婚礼地点之间的过渡（430x556） */
+.deco-cake {
+  display: block;
+  width: 190rpx;
+  height: 246rpx;
+  margin: 6rpx auto 0;
+}
+
+/* 祝福页落款：新郎新娘手牵手（452x552） */
+.deco-couple {
+  display: block;
+  width: 180rpx;
+  height: 220rpx;
+  margin: -40px auto 4rpx;
+}
+
 /* ========== 整页翻页（swiper）布局：每页占满一屏 ========== */
 .page-swiper {
   width: 100%;
   height: 100vh;
+  /* 内容层压在纸纹背景之上 */
+  position: relative;
+  z-index: 1;
 }
 
 /* swiper-item 内的区块铺满整屏，水平留白沿用原间距 */
@@ -1018,6 +1101,12 @@
   .form-textarea { height: 100rpx; }
   .footer-mini { padding-top: 14rpx; }
   .blessing-wall-scroll { min-height: 120rpx; }
+  /* 插画同步缩小，保证每页完整显示 */
+  .deco-cats { width: 148rpx; height: 140rpx; margin-bottom: 16rpx; }
+  .deco-bouquet { width: 108rpx; height: 153rpx; }
+  .deco-book { top: 54rpx; width: 108rpx; height: 119rpx; }
+  .deco-cake { width: 148rpx; height: 191rpx; }
+  .deco-couple { width: 140rpx; height: 171rpx; }
 }
 
 @media (max-height: 580px) {

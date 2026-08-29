@@ -9,8 +9,15 @@
       { "type": "file", "value": "README.md" },
       { "type": "folder", "value": ".claude" },
       { "type": "file", "value": "小程序头像.png" },
-      { "type": "glob", "value": "assets/images/*removebg-preview.png" },
-      { "type": "file", "value": "assets/images/微信图片_20260825144326_122836_2.png" }
+      { "type": "file", "value": "assets/images/微信图片_20260825144326_122836_2.png" },
+      { "type": "file", "value": "assets/images/1-removebg-preview.png" },
+      { "type": "file", "value": "assets/images/礼物-removebg-preview.png" },
+      { "type": "file", "value": "assets/images/囍.jpg" },
+      { "type": "file", "value": "assets/images/求婚.jpg" },
+      { "type": "file", "value": "assets/images/82303e8c8c068a437527b284f9b93577.jpg" },
+      { "type": "file", "value": "assets/images/paper-bg.png" },
+      { "type": "file", "value": "assets/images/背景.png" },
+      { "type": "file", "value": "assets/images/photoes/1111.jpg" }
     ],
     "include": []
   },
