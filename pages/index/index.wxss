@@ -103,7 +103,6 @@
 .d9 { animation-delay: 1.09s !important; }
 .d10 { animation-delay: 1.22s !important; }
 
-
 @keyframes slideInLeft {
   from { opacity: 0; transform: translateX(-80rpx); }
   to { opacity: 1; transform: translateX(0); }
@@ -650,10 +649,15 @@
 }
 
 .tl-ic {
-  width: 34rpx;
-  height: 30rpx;
+  width: 70rpx;
+  height: 70rpx;
   margin-right: 8rpx;
   flex-shrink: 0;
+}
+
+/* 第三行（喜宴开席）icon 放大：scale 不占布局，右侧英文与左侧文字位置都不动 */
+.tl-ic-lg {
+  transform: scale(1.6);
 }
 
 .tl-en {

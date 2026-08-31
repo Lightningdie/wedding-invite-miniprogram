@@ -64,6 +64,10 @@ function formatTime(date) {
 // 合并配置：旧版 unsplash 外链封面已被本地照片（assets/images）取代，任何来源的旧图都清掉
 function mergeWedding(saved) {
   const merged = { ...DEFAULT_WEDDING, ...saved }
+  // 旧配置里存过空的 musicSrc 会盖掉内置 bgm.mp3，导致背景音乐静默失效，这里补回默认
+  if (!merged.musicSrc) {
+    merged.musicSrc = DEFAULT_WEDDING.musicSrc
+  }
   if (merged.coverImage && merged.coverImage.indexOf('images.unsplash.com') > -1) {
     merged.coverImage = DEFAULT_WEDDING.coverImage
   }

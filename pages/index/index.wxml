@@ -1,6 +1,7 @@
 <!--pages/index/index.wxml-->
 <!-- 整页竖向翻页：上滑切换整页，新页内容沿用原有入场动画依次浮现 -->
-<view class="invite">
+<!-- 根节点监听首次触摸：冷启动被拦的背景音乐在此补播 -->
+<view class="invite" bindtouchstart="onRootTouchStart">
 
   <view class="music-btn {{musicOn ? 'music-on' : ''}}" bindtap="onToggleMusic">
     <image class="music-icon" src="/assets/images/music-note.png"></image>
@@ -198,7 +199,7 @@
                 wx:key="time"
               >
                 <view class="tl-left">
-                  <image class="tl-ic" src="{{item.icon}}" mode="aspectFit"></image>
+                  <image class="tl-ic {{index === 2 ? 'tl-ic-lg' : ''}}" src="{{item.icon}}" mode="aspectFit"></image>
                   <text class="tl-en">{{item.en}}</text>
                 </view>
                 <view class="tl-line"></view>

@@ -50,6 +50,10 @@ Page({
 
   onShow() {
     this.loadWedding()
+    // 从后台回前台：音乐本应在播就接着播（用户手动关过则不打扰）
+    if (this.data.musicOn) {
+      music.playMusic(this.data.wedding.musicSrc || '/assets/music/bgm.mp3')
+    }
   },
 
   onUnload() {
@@ -67,6 +71,8 @@ Page({
   async bootstrap() {
     await this.loadWedding()
     this.startCountdown()
+    // 打开即播背景音乐（个别机型拦截冷启动自动播放，见 onRootTouchStart 兜底）
+    this.autoPlayMusic()
     await this.loadBlessings()
   },
 
@@ -317,6 +323,34 @@ Page({
   async loadBlessings() {
     const blessings = await storage.loadBlessingsAsync()
     this.setData({ blessings, blessingsLoading: false })
+  },
+
+  // —— 背景音乐：打开小程序默认自动播放 ——
+  autoPlayMusic() {
+    // 配置缺路径时兜底到包内置的 bgm.mp3
+    const src = this.data.wedding.musicSrc || '/assets/music/bgm.mp3'
+    music.playMusic(src)
+    this.setData({ musicOn: true })
+    // 部分机型冷启动不允许自动出声：600ms 后核实，被拦则等首次触摸补播
+    setTimeout(() => {
+      if (!music.getPlaying()) {
+        this._musicBlocked = true
+      }
+    }, 600)
+  },
+
+  // 首次触摸兜底：被系统拦下的自动播放在用户第一次触屏时补上
+  onRootTouchStart() {
+    if (!this._musicBlocked) {
+      return
+    }
+    this._musicBlocked = false
+    music.playMusic(this.data.wedding.musicSrc || '/assets/music/bgm.mp3')
+    setTimeout(() => {
+      if (!music.getPlaying()) {
+        this.setData({ musicOn: false })
+      }
+    }, 400)
   },
 
   onToggleMusic() {
