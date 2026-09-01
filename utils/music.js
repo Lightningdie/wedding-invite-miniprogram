@@ -10,7 +10,7 @@ function getAudio() {
     audioCtx.loop = true
     audioCtx.obeyMuteSwitch = false
     audioCtx.onError((err) => {
-      console.log('音乐播放失败，请确认已上传 assets/music/bgm.mp3', err)
+      console.log('音乐播放失败，请确认静态托管已上传 music/bgm.mp3（node .ci/upload-static.js）', err)
       isPlaying = false
     })
     audioCtx.onPlay(() => {

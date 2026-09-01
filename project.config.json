@@ -2,22 +2,118 @@
   "description": "Amour・爱意佳期 婚礼邀请函",
   "packOptions": {
     "ignore": [
-      { "type": "file", "value": "firstpage.jpg" },
-      { "type": "file", "value": "secondpage.jpg" },
-      { "type": "folder", "value": "pdf_images" },
-      { "type": "file", "value": "婚礼请柬修改方案(1).pdf" },
-      { "type": "file", "value": "README.md" },
-      { "type": "folder", "value": ".claude" },
-      { "type": "file", "value": "小程序头像.png" },
-      { "type": "file", "value": "assets/images/微信图片_20260825144326_122836_2.png" },
-      { "type": "file", "value": "assets/images/1-removebg-preview.png" },
-      { "type": "file", "value": "assets/images/礼物-removebg-preview.png" },
-      { "type": "file", "value": "assets/images/囍.jpg" },
-      { "type": "file", "value": "assets/images/求婚.jpg" },
-      { "type": "file", "value": "assets/images/82303e8c8c068a437527b284f9b93577.jpg" },
-      { "type": "file", "value": "assets/images/paper-bg.png" },
-      { "type": "file", "value": "assets/images/背景.png" },
-      { "type": "file", "value": "assets/images/photoes/1111.jpg" }
+      {
+        "type": "file",
+        "value": "firstpage.jpg"
+      },
+      {
+        "type": "file",
+        "value": "secondpage.jpg"
+      },
+      {
+        "type": "folder",
+        "value": "pdf_images"
+      },
+      {
+        "type": "file",
+        "value": "婚礼请柬修改方案(1).pdf"
+      },
+      {
+        "type": "file",
+        "value": "README.md"
+      },
+      {
+        "type": "folder",
+        "value": ".claude"
+      },
+      {
+        "type": "file",
+        "value": "小程序头像.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/微信图片_20260825144326_122836_2.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/1-removebg-preview.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/礼物-removebg-preview.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/囍.jpg"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/求婚.jpg"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/82303e8c8c068a437527b284f9b93577.jpg"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/paper-bg.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/背景.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/photoes/1111.jpg"
+      },
+      {
+        "type": "folder",
+        "value": "assets/music"
+      },
+      {
+        "type": "folder",
+        "value": "assets/images/photoes"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/firstpage.jpg"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/secondpage.jpg"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/玫瑰.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/2-removebg-preview.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/3-removebg-preview.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/4-removebg-preview.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/5-removebg-preview.png"
+      },
+      {
+        "type": "file",
+        "value": "assets/images/求婚-removebg-preview.png"
+      },
+      {
+        "type": "folder",
+        "value": ".ci"
+      },
+      {
+        "type": "file",
+        "value": "private.wx772af07350cf2466.key"
+      }
     ],
     "include": []
   },
@@ -64,7 +160,7 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "2.19.4",
+  "libVersion": "3.17.2",
   "appid": "wx772af07350cf2466",
   "projectname": "Amour・爱意佳期",
   "condition": {},

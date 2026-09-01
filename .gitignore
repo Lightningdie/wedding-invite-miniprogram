@@ -1,0 +1,5 @@
+
+# 小程序上传密钥，严禁提交
+*.key
+node_modules/
+.ci/

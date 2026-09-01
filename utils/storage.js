@@ -10,6 +10,27 @@ const KEY_BLESSINGS = 'blessings'
 const KEY_GUESTS = 'guest_list'
 const DOC_WEDDING_ID = 'main'
 
+// 静态托管域名（媒体资源最终地址）与历史 cloud:// 文件名 -> 现名的映射
+const STATIC_BASE = 'https://cloud1-d1gknvmit778344ba-1327805972.tcloudbaseapp.com'
+const LEGACY_FILE_RENAMES = {
+  'images/玫瑰.png': 'images/rose.png',
+  'images/求婚-removebg-preview.png': 'images/propose.png'
+}
+
+// 旧配置里存的是 cloud:// 云存储地址（客户端 getTempFileURL 受权限规则限制，已弃用），
+// 统一迁移到静态托管公网 https 地址
+function migrateMediaSrc(v) {
+  if (typeof v !== 'string' || v.indexOf('cloud://') !== 0) {
+    return v
+  }
+  const slash = v.indexOf('/', 'cloud://'.length)
+  if (slash < 0) {
+    return v
+  }
+  const path = v.slice(slash + 1)
+  return STATIC_BASE + '/' + (LEGACY_FILE_RENAMES[path] || path)
+}
+
 let cloudReady = false
 
 function initCloud() {
@@ -61,25 +82,51 @@ function formatTime(date) {
   return `${month}月${day}日 ${padZero(hour)}:${padZero(minute)}`
 }
 
-// 合并配置：旧版 unsplash 外链封面已被本地照片（assets/images）取代，任何来源的旧图都清掉
+// 合并配置：媒体资源已全部改走静态托管（公网 https），旧配置里的 cloud:// 云存储地址
+// 迁移到静态托管；包内本地路径、unsplash 外链、误存的占位文本（如 "URL"）一律回退默认地址
 function mergeWedding(saved) {
   const merged = { ...DEFAULT_WEDDING, ...saved }
-  // 旧配置里存过空的 musicSrc 会盖掉内置 bgm.mp3，导致背景音乐静默失效，这里补回默认
-  if (!merged.musicSrc) {
+  const isValidMediaSrc = (v) =>
+    typeof v === 'string' &&
+    (v.indexOf('cloud://') === 0 || v.indexOf('https://') === 0 || v.indexOf('http://') === 0)
+  // cloud:// 优先迁移成静态托管地址，迁移失败再走默认回退
+  merged.musicSrc = migrateMediaSrc(merged.musicSrc)
+  merged.coverImage = migrateMediaSrc(merged.coverImage)
+  merged.inviteImage = migrateMediaSrc(merged.inviteImage)
+  // 旧配置里存过包内本地路径、空值或占位文本会盖掉云存储默认地址，导致音乐/图片静默失效，这里补回默认
+  if (!isValidMediaSrc(merged.musicSrc)) {
     merged.musicSrc = DEFAULT_WEDDING.musicSrc
   }
-  if (merged.coverImage && merged.coverImage.indexOf('images.unsplash.com') > -1) {
+  if (!isValidMediaSrc(merged.coverImage)) {
     merged.coverImage = DEFAULT_WEDDING.coverImage
   }
+  if (!isValidMediaSrc(merged.inviteImage)) {
+    merged.inviteImage = DEFAULT_WEDDING.inviteImage
+  }
+  // 装饰图为对象配置，逐项迁移 cloud:// 后校验，无效地址回填默认值
+  const deco = { ...DEFAULT_WEDDING.deco, ...((saved && saved.deco) || {}) }
+  Object.keys(deco).forEach((key) => {
+    deco[key] = migrateMediaSrc(deco[key])
+    if (!isValidMediaSrc(deco[key])) {
+      deco[key] = DEFAULT_WEDDING.deco[key]
+    }
+  })
+  merged.deco = deco
   // 地图导航功能已移除，清理旧配置里遗留的经纬度
   delete merged.latitude
   delete merged.longitude
-  // 旧版 unsplash 占位照片已被本地照片（assets/images/photoes）取代，检测到外链即整体换回默认
-  if (
-    Array.isArray(merged.photos) &&
-    merged.photos.some((p) => p && typeof p.src === 'string' && p.src.indexOf('images.unsplash.com') > -1)
-  ) {
-    merged.photos = DEFAULT_WEDDING.photos
+  // 照片逐张校验：先迁移 cloud://，无效地址按同序号默认照片回填，越界的无效条目丢弃
+  if (Array.isArray(merged.photos)) {
+    merged.photos = merged.photos
+      .map((p, i) => {
+        const fallback = DEFAULT_WEDDING.photos[i]
+        const src = p && migrateMediaSrc(p.src)
+        if (!p || typeof p !== 'object' || !isValidMediaSrc(src)) {
+          return fallback ? { ...fallback, ...(p || {}), src: fallback.src } : null
+        }
+        return { ...p, src }
+      })
+      .filter(Boolean)
   }
   // 旧配置的流程条目没有英文名（en）和图标（icon），按序号回填默认值，保证左右分栏排版完整
   if (Array.isArray(merged.timeline)) {
@@ -172,9 +219,11 @@ async function loadWeddingAsync() {
     return local
   }
   try {
-    const res = await db.collection('wedding_config').doc(DOC_WEDDING_ID).get()
-    if (res && res.data) {
-      const merged = mergeWedding(res.data)
+    // 空集合时 doc('main').get() 会抛「cannot find document」错误，改用查询：无记录返回空数组
+    const res = await db.collection('wedding_config').limit(1).get()
+    const doc = res && res.data && res.data[0]
+    if (doc) {
+      const merged = mergeWedding(doc)
       delete merged._id
       setWeddingLocal(merged)
       return merged

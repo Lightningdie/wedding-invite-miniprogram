@@ -23,6 +23,7 @@ Page({
     blessingsLoading: true,
     latestBlessingId: 0,
     wedding: {},
+    shareImage: '',
     musicOn: false,
     cloudTip: '',
     current: 0,
@@ -52,7 +53,7 @@ Page({
     this.loadWedding()
     // 从后台回前台：音乐本应在播就接着播（用户手动关过则不打扰）
     if (this.data.musicOn) {
-      music.playMusic(this.data.wedding.musicSrc || '/assets/music/bgm.mp3')
+      music.playMusic(this.data.wedding.musicSrc)
     }
   },
 
@@ -79,6 +80,62 @@ Page({
   async loadWedding() {
     const wedding = await storage.loadWeddingAsync()
     this.setData({ wedding })
+    // 兜底：万一配置里仍残留 cloud:// 云存储地址，统一换成 https 临时链接
+    // （正常情况媒体走静态托管公网地址，此处直接跳过）
+    await this.materializeCloudMedia(wedding)
+  },
+
+  // 收集配置里的全部云存储文件，一次性换取 https 临时链接后回填页面数据（分享封面也依赖它）
+  materializeCloudMedia(wedding) {
+    const ids = []
+    const push = (v) => {
+      if (v && String(v).indexOf('cloud://') === 0 && ids.indexOf(v) < 0) {
+        ids.push(v)
+      }
+    }
+    push(wedding.coverImage)
+    push(wedding.inviteImage)
+    push(wedding.musicSrc)
+    Object.keys(wedding.deco || {}).forEach((key) => push(wedding.deco[key]))
+    ;(wedding.photos || []).forEach((p) => push(p && p.src))
+    if (!ids.length) {
+      return Promise.resolve()
+    }
+    return new Promise((resolve) => {
+      wx.cloud.getTempFileURL({
+        fileList: ids,
+        success: (res) => {
+          const urlMap = {}
+          ;(res.fileList || []).forEach((f) => {
+            if (f && f.tempFileURL) {
+              urlMap[f.fileID] = f.tempFileURL
+            } else if (f && f.status && f.status !== 0) {
+              console.log('云存储文件获取链接失败，请确认已上传', f.fileID, f.errMsg)
+            }
+          })
+          const pick = (v) => urlMap[v] || v
+          this.setData({
+            wedding: {
+              ...wedding,
+              coverImage: pick(wedding.coverImage),
+              inviteImage: pick(wedding.inviteImage),
+              musicSrc: pick(wedding.musicSrc),
+              deco: Object.keys(wedding.deco || {}).reduce((acc, key) => {
+                acc[key] = pick(wedding.deco[key])
+                return acc
+              }, {}),
+              photos: (wedding.photos || []).map((p) => (p && p.src ? { ...p, src: pick(p.src) } : p))
+            },
+            shareImage: pick(wedding.coverImage)
+          })
+          resolve()
+        },
+        fail: (err) => {
+          console.log('云存储临时链接获取失败', err)
+          resolve()
+        }
+      })
+    })
   },
 
   // 翻页：先复位所有入场状态，滑入稳定后点亮当前页，内容按原有动画依次进入
@@ -327,8 +384,8 @@ Page({
 
   // —— 背景音乐：打开小程序默认自动播放 ——
   autoPlayMusic() {
-    // 配置缺路径时兜底到包内置的 bgm.mp3
-    const src = this.data.wedding.musicSrc || '/assets/music/bgm.mp3'
+    // musicSrc 默认指向静态托管公网地址，加载失败时音乐组件静默失败，不影响页面
+    const src = this.data.wedding.musicSrc
     music.playMusic(src)
     this.setData({ musicOn: true })
     // 部分机型冷启动不允许自动出声：600ms 后核实，被拦则等首次触摸补播
@@ -345,7 +402,7 @@ Page({
       return
     }
     this._musicBlocked = false
-    music.playMusic(this.data.wedding.musicSrc || '/assets/music/bgm.mp3')
+    music.playMusic(this.data.wedding.musicSrc)
     setTimeout(() => {
       if (!music.getPlaying()) {
         this.setData({ musicOn: false })
@@ -381,7 +438,7 @@ Page({
       if (!music.getPlaying()) {
         this.setData({ musicOn: false })
         wx.showToast({
-          title: '请将 mp3 放到 assets/music/bgm.mp3',
+          title: '背景音乐加载失败，请稍后再试',
           icon: 'none'
         })
       }
@@ -409,19 +466,25 @@ Page({
   // 转发给好友：button open-type="share" 与右上角菜单都会走到这里
   onShareAppMessage() {
     const w = this.data.wedding
-    return {
+    const share = {
       title: `${w.groom} & ${w.bride} 的婚礼邀请函`,
-      path: '/pages/index/index',
-      imageUrl: w.coverImage
+      path: '/pages/index/index'
     }
+    if (this.data.shareImage) {
+      share.imageUrl = this.data.shareImage
+    }
+    return share
   },
 
   // 分享到朋友圈：从右上角「···」菜单进入（仅安卓支持），点开后以单页模式浏览
   onShareTimeline() {
     const w = this.data.wedding
-    return {
-      title: `${w.groom} & ${w.bride} 的婚礼邀请函`,
-      imageUrl: w.coverImage
+    const share = {
+      title: `${w.groom} & ${w.bride} 的婚礼邀请函`
     }
+    if (this.data.shareImage) {
+      share.imageUrl = this.data.shareImage
+    }
+    return share
   }
 })

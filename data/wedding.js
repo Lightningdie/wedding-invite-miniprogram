@@ -1,6 +1,18 @@
 /**
  * 婚礼默认配置（后台可覆盖）
+ * 媒体资源（音乐/照片/装饰图/封面）走云开发「静态托管」，不占小程序包体积
+ *
+ * 静态托管默认域名公网可读，直接返回普通 https 链接：
+ * 不依赖 getTempFileURL，不受云存储权限规则（STORAGE_EXCEED_AUTHORITY）影响
+ *
+ * 配置步骤：
+ * 1. 把待发布文件按目标相对路径放进 .ci/staging/（images/、images/photoes/、music/）
+ * 2. 运行 node .ci/upload-static.js 上传到静态托管
+ * 3. 下方 STATIC_BASE 已固定为本环境默认域名，一般无需改动
  */
+const STATIC_BASE = 'https://cloud1-d1gknvmit778344ba-1327805972.tcloudbaseapp.com'
+const cdn = (path) => STATIC_BASE + '/' + path
+
 const DEFAULT_WEDDING = {
   groom: '刘浩宇',
   bride: '张婧怡',
@@ -13,11 +25,20 @@ const DEFAULT_WEDDING = {
   venueName: '盐山县县宾馆',
   venueHall: '五楼宴会厅',
   venueAddress: '河北省沧州市盐山县振华北大街263号',
-  musicSrc: '/assets/music/bgm.mp3',
+  musicSrc: cdn('music/bgm.mp3'),
   musicTitle: '婚礼背景音乐',
   closing: '愿这份喜悦，亦能与您常在。',
-  coverImage: '/assets/images/firstpage.jpg',
-  inviteImage: '/assets/images/secondpage.jpg',
+  coverImage: cdn('images/firstpage.jpg'),
+  inviteImage: cdn('images/secondpage.jpg'),
+  // 页面装饰图（wxml 中按 {{wedding.deco.xxx}} 绑定），文件名用 ASCII，避免中文编码差异
+  deco: {
+    rose: cdn('images/rose.png'),
+    bouquet: cdn('images/2-removebg-preview.png'),
+    cake: cdn('images/3-removebg-preview.png'),
+    couple: cdn('images/4-removebg-preview.png'),
+    book: cdn('images/5-removebg-preview.png'),
+    propose: cdn('images/propose.png')
+  },
   heroLatin: 'We got married',
   inviteHeadline: 'Come for the love, stay for the wedding',
   inviteLines: [
@@ -40,14 +61,14 @@ const DEFAULT_WEDDING = {
     { time: '11:00', en: 'Photos', icon: '/assets/images/icons/icon-photos.png', title: '合影留念', desc: '与新人合影，记录美好瞬间' }
   ],
   photos: [
-    { src: '/assets/images/photoes/1.jpg', title: '初次相遇', desc: '那一刻的心动，是故事的开始' },
-    { src: '/assets/images/photoes/2.jpg', title: '甜蜜日常', desc: '平凡日子里的小确幸' },
-    { src: '/assets/images/photoes/3.jpg', title: '携手同行', desc: '一路相伴，走过春夏秋冬' },
-    { src: '/assets/images/photoes/4.jpg', title: '共度余生', desc: '从此刻起，执子之手与子偕老' },
-    { src: '/assets/images/photoes/5.jpg', title: '约定一生', desc: '把最美的风景留给彼此' },
-    { src: '/assets/images/photoes/6.jpg', title: '幸福将至', desc: '期待与你并肩走向礼堂' },
-    { src: '/assets/images/photoes/7.jpg', title: '心动时刻', desc: '每个瞬间都值得珍藏' },
-    { src: '/assets/images/photoes/8.jpg', title: '爱的旅程', desc: '往后余生，请多指教' }
+    { src: cdn('images/photoes/1.jpg'), title: '初次相遇', desc: '那一刻的心动，是故事的开始' },
+    { src: cdn('images/photoes/2.jpg'), title: '甜蜜日常', desc: '平凡日子里的小确幸' },
+    { src: cdn('images/photoes/3.jpg'), title: '携手同行', desc: '一路相伴，走过春夏秋冬' },
+    { src: cdn('images/photoes/4.jpg'), title: '共度余生', desc: '从此刻起，执子之手与子偕老' },
+    { src: cdn('images/photoes/5.jpg'), title: '约定一生', desc: '把最美的风景留给彼此' },
+    { src: cdn('images/photoes/6.jpg'), title: '幸福将至', desc: '期待与你并肩走向礼堂' },
+    { src: cdn('images/photoes/7.jpg'), title: '心动时刻', desc: '每个瞬间都值得珍藏' },
+    { src: cdn('images/photoes/8.jpg'), title: '爱的旅程', desc: '往后余生，请多指教' }
   ],
   stories: [
     {

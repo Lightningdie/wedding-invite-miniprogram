@@ -70,7 +70,7 @@
           bindtouchstart="onInnerTouchStart"
           bindtouchend="onInnerTouchEnd"
         >
-        <image class="deco-rose enter enter-left d9" src="/assets/images/玫瑰.png" mode="aspectFit"></image>
+        <image class="deco-rose enter enter-left d9" src="{{wedding.deco.rose}}" mode="aspectFit"></image>
           <view class="page-body pb-invitation" id="body-invitation">
             <view class="invite-headline enter enter-down d1">{{wedding.inviteHeadline}}</view>
             <view class="invite-photo-wrap enter enter-up d2">
@@ -95,7 +95,7 @@
           </view>
         </scroll-view>
         <!-- 右下角：玫瑰花束点缀，飘带垂角 -->
-        <image class="deco-bouquet enter enter-right d9" src="/assets/images/2-removebg-preview.png" mode="aspectFit"></image>
+        <image class="deco-bouquet enter enter-right d9" src="{{wedding.deco.bouquet}}" mode="aspectFit"></image>
       </view>
     </swiper-item>
 
@@ -105,8 +105,8 @@
         <view class="latin-tag enter enter-down d1">Gallery</view>
         <view class="section-title enter enter-down d2">甜蜜相册</view>
         <!-- 右上角：复古 Wedding 手账，呼应相册主题 -->
-        <image class="deco-propose enter enter-left d4" src="/assets/images/求婚-removebg-preview.png" mode="aspectFit"></image>
-        <image class="deco-book enter enter-right d4" src="/assets/images/5-removebg-preview.png" mode="aspectFit"></image>
+        <image class="deco-propose enter enter-left d4" src="{{wedding.deco.propose}}" mode="aspectFit"></image>
+        <image class="deco-book enter enter-right d4" src="{{wedding.deco.book}}" mode="aspectFit"></image>
         <view class="ornament enter enter-up d3">❦</view>
         <scroll-view
           class="inner-scroll"
@@ -212,7 +212,7 @@
             </view>
 
             <!-- 蛋糕与交杯酒：流程列表与婚礼地点之间的喜庆过渡 -->
-            <image class="deco-cake enter enter-up d7" src="/assets/images/3-removebg-preview.png" mode="aspectFit"></image>
+            <image class="deco-cake enter enter-up d7" src="{{wedding.deco.cake}}" mode="aspectFit"></image>
 
             <!-- 婚礼地点：与流程同页，去掉地图与导航按钮 -->
             <view class="tl-address enter enter-up d7">
@@ -291,7 +291,7 @@
 
         <view class="footer-mini enter enter-up d6">
           <!-- 新郎新娘手牵手：落款配图 -->
-          <image class="deco-couple" src="/assets/images/4-removebg-preview.png" mode="aspectFit"></image>
+          <image class="deco-couple" src="{{wedding.deco.couple}}" mode="aspectFit"></image>
           <view class="footer-rule"></view>
           <view class="footer-closing">{{wedding.closing}}</view>
           <view class="footer-names">{{wedding.groom}} & {{wedding.bride}}</view>
