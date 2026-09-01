@@ -1,7 +1,7 @@
 /* 全局样式 · 欧式复古 */
 page {
   background-color: #FAF5EC;
-  font-family: Georgia, 'Times New Roman', 'Songti SC', 'PingFang SC', serif;
+  font-family: Georgia, 'Times New Roman', 宋体, 'PingFang SC', serif;
   color: #5C4030;
   line-height: 1.6;
   overflow-x: hidden;

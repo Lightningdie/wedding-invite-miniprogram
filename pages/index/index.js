@@ -51,9 +51,21 @@ Page({
 
   onShow() {
     this.loadWedding()
+    // 从后台回前台：若正停在相册页，恢复胶片自动上滑
+    if (this.data.current === 2 && !this.data.filmAutoplay) {
+      this.setData({ filmAutoplay: true })
+    }
     // 从后台回前台：音乐本应在播就接着播（用户手动关过则不打扰）
     if (this.data.musicOn) {
       music.playMusic(this.data.wedding.musicSrc)
+    }
+  },
+
+  onHide() {
+    // 切后台 / 聚焦其他应用 / 退出小程序：停住胶片自动滚动
+    this.clearFilmTimer()
+    if (this.data.filmAutoplay) {
+      this.setData({ filmAutoplay: false })
     }
   },
 
