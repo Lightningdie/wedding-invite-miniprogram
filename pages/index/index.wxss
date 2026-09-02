@@ -177,8 +177,8 @@
 .music-btn {
   position: fixed;
   /* 刘海屏适配：状态栏高度 + 原间距，避免顶进状态栏 */
-  top: calc(50rpx + constant(safe-area-inset-top));
-  top: calc(50rpx + env(safe-area-inset-top));
+  top: calc(40rpx + constant(safe-area-inset-top));
+  top: calc(40rpx + env(safe-area-inset-top));
   left: 28rpx;
   z-index: 110;
   width: 64rpx;
