@@ -253,6 +253,7 @@
           <scroll-view
             class="inner-scroll blessing-wall-scroll"
             id="scroll-wall"
+            style="{{wallHeight ? 'height:' + wallHeight + 'px' : ''}}"
             scroll-y
             enhanced
             show-scrollbar="{{false}}"
@@ -265,7 +266,11 @@
             bindtouchstart="onInnerTouchStart"
             bindtouchend="onInnerTouchEnd"
           >
-            <view id="body-wall">
+            <view
+              id="body-wall"
+              class="wall-body {{wallLoop ? 'wall-loop' : ''}} {{wallPaused ? 'wall-paused' : ''}}"
+              style="{{wallLoop ? '--wall-shift:' + wallShift + 'px;animation-duration:' + wallDuration + 's' : ''}}"
+            >
               <!-- 云端读取中：骨架占位 -->
               <block wx:if="{{blessingsLoading}}">
                 <view class="blessing-skeleton" wx:for="{{[1, 2]}}" wx:key="*this">
@@ -278,7 +283,7 @@
                 还没有祝福，来写下第一条吧 ♡
               </view>
               <block wx:else>
-                <view class="blessing-item {{item.id === latestBlessingId ? 'blessing-new' : ''}}" wx:for="{{blessings}}" wx:key="id">
+                <view class="blessing-item {{item.id === latestBlessingId ? 'blessing-new' : ''}}" wx:for="{{wallList}}" wx:key="_k">
                   <view class="blessing-header">
                     <text class="blessing-name">{{item.name}}</text>
                     <text class="blessing-time">{{item.time}}</text>

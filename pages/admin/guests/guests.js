@@ -54,7 +54,8 @@ Page({
 
   openEdit(e) {
     const id = e.currentTarget.dataset.id
-    const guest = this.data.guests.find((g) => g.id === id)
+    // id 统一按字符串比较：数字 id 经 dataset 传参在部分机型会变成字符串
+    const guest = this.data.guests.find((g) => String(g.id) === String(id))
     if (!guest) {
       return
     }
@@ -105,7 +106,8 @@ Page({
       message: form.message.trim(),
       time: storage.formatTime(new Date())
     }
-    const result = await storage.upsertGuestAsync(guest)
+    // manage=true：管理页走云函数（云端权限），可改删所有宾客记录
+    const result = await storage.upsertGuestAsync(guest, true)
     this.setData({ showForm: false, guests: result.list })
     this.refresh()
     wx.showToast({
@@ -122,7 +124,9 @@ Page({
         if (!res.confirm) {
           return
         }
-        await storage.removeGuestAsync(id)
+        // 先用返回的本地列表立即刷新界面，再异步拉云端核对
+        const result = await storage.removeGuestAsync(id)
+        this.setData({ guests: result.list })
         this.refresh()
       }
     })

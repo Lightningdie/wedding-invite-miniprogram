@@ -113,6 +113,10 @@
       {
         "type": "file",
         "value": "private.wx772af07350cf2466.key"
+      },
+      {
+        "type": "folder",
+        "value": "cloudfunctions"
       }
     ],
     "include": []
@@ -160,6 +164,7 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
+  "cloudfunctionRoot": "cloudfunctions/",
   "libVersion": "3.17.2",
   "appid": "wx772af07350cf2466",
   "projectname": "Amour・爱意佳期",

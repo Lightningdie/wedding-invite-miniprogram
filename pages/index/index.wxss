@@ -1059,6 +1059,22 @@
   min-height: 160rpx;
 }
 
+/* 祝福超过 3 条：列表翻倍后整体上移半程，实现无缝循环滚动 */
+.wall-body.wall-loop {
+  animation-name: wallMarquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.wall-body.wall-loop.wall-paused {
+  animation-play-state: paused;
+}
+
+@keyframes wallMarquee {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(-1 * var(--wall-shift, 0px))); }
+}
+
 /* 滚动区内容不满一屏时垂直居中，满屏则自然排列 */
 .page-body {
   min-height: 100%;

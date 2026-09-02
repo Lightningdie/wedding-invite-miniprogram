@@ -1,0 +1,9 @@
+{
+  "name": "manageGuests",
+  "version": "1.0.0",
+  "description": "宾客名单云端管理：绕过「仅创建者可读写」权限，管理页对 guests 集合真正的增删改查",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

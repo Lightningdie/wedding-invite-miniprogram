@@ -8,6 +8,8 @@ const { DEFAULT_WEDDING } = require('../data/wedding.js')
 const KEY_WEDDING = 'wedding_config'
 const KEY_BLESSINGS = 'blessings'
 const KEY_GUESTS = 'guest_list'
+// 已删除宾客 id 墓碑：云端记录受「仅创建者可读写」权限限制删不掉时，防止下次从云端拉取时复活
+const KEY_GUEST_DELETED = 'guest_deleted_ids'
 const DOC_WEDDING_ID = 'main'
 
 // 静态托管域名（媒体资源最终地址）与历史 cloud:// 文件名 -> 现名的映射
@@ -185,6 +187,19 @@ function setGuestsLocal(list) {
   wx.setStorageSync(KEY_GUESTS, list || [])
 }
 
+// 已删除宾客 id 列表（统一存字符串，避免数字/字符串 id 比较不一致）
+function getDeletedGuestIds() {
+  try {
+    return (wx.getStorageSync(KEY_GUEST_DELETED) || []).map(String)
+  } catch (e) {
+    return []
+  }
+}
+
+function setDeletedGuestIds(list) {
+  wx.setStorageSync(KEY_GUEST_DELETED, list || [])
+}
+
 function getWedding() {
   return getWeddingLocal()
 }
@@ -308,22 +323,65 @@ async function addBlessingAsync(blessing) {
   }
 }
 
+// 云函数 manageGuests（管理端专用）：以云端权限执行，绕过「仅创建者可读写」限制，
+// 让名单管理界面的增删改查真正落到云数据库；函数未部署/失败时返回 null 走回退链
+async function callGuestsApi(action, payload) {
+  if (!cloudReady || !wx.cloud.callFunction) {
+    return null
+  }
+  try {
+    const res = await wx.cloud.callFunction({
+      name: 'manageGuests',
+      data: Object.assign({ action }, payload || {})
+    })
+    const result = res && res.result
+    if (result && result.ok) {
+      return result
+    }
+    console.log('manageGuests 拒绝请求', result && result.error)
+  } catch (e) {
+    console.log('manageGuests 云函数不可用，回退直连', e)
+  }
+  return null
+}
+
 async function loadGuestsAsync() {
   const local = getGuestsLocal()
+  // 云函数优先：全量拉取（绕过权限）；墓碑过滤兜底历史删除失败的记录
+  const viaFn = await callGuestsApi('list')
+  if (viaFn && viaFn.list) {
+    const deleted = getDeletedGuestIds()
+    const list = viaFn.list
+      .map((item) => ({
+        id: item._id || item.id,
+        name: item.name,
+        count: item.count,
+        status: item.status,
+        message: item.message,
+        time: item.time
+      }))
+      .filter((g) => deleted.indexOf(String(g.id)) < 0)
+    setGuestsLocal(list)
+    return list
+  }
   const db = getDb()
   if (!db) {
     return local
   }
   try {
     const res = await db.collection('guests').orderBy('createdAt', 'desc').limit(200).get()
-    const list = (res.data || []).map((item) => ({
-      id: item._id || item.id,
-      name: item.name,
-      count: item.count,
-      status: item.status,
-      message: item.message,
-      time: item.time
-    }))
+    // 已删除墓碑过滤：云端删不掉的记录（权限仅创建者可写）在本机保持隐藏，避免删除后又被拉回来
+    const deleted = getDeletedGuestIds()
+    const list = (res.data || [])
+      .map((item) => ({
+        id: item._id || item.id,
+        name: item.name,
+        count: item.count,
+        status: item.status,
+        message: item.message,
+        time: item.time
+      }))
+      .filter((g) => deleted.indexOf(String(g.id)) < 0)
     if (list.length > 0) {
       setGuestsLocal(list)
       return list
@@ -343,67 +401,116 @@ async function saveGuestsCloud(list) {
   return true
 }
 
-async function upsertGuestAsync(guest) {
-  const guests = getGuestsLocal()
-  const idx = guests.findIndex((g) => g.id === guest.id)
-  if (idx >= 0) {
-    guests[idx] = guest
-  } else {
-    guests.unshift(guest)
+// manage=true 表示来自名单管理页：可走 manageGuests 云函数（云端权限，能改删所有人记录）。
+// 首页宾客提交祝福的自动登记走直连（创建者权限即可），避免宾客触发云函数抢先成为管理员。
+async function upsertGuestAsync(guest, manage) {
+  const data = {
+    name: guest.name,
+    count: guest.count,
+    status: guest.status,
+    message: guest.message || '',
+    time: guest.time || formatTime(new Date())
   }
-  setGuestsLocal(guests)
+  let id = guest.id
+  let cloud = false
 
-  const db = getDb()
-  if (!db) {
-    return { ok: true, cloud: false, list: guests }
-  }
-  try {
-    const data = {
-      name: guest.name,
-      count: guest.count,
-      status: guest.status,
-      message: guest.message || '',
-      time: guest.time || formatTime(new Date()),
-      updatedAt: db.serverDate()
+  // 1) 云函数优先（仅管理页）：绕过「仅创建者可读写」，任何记录都能改
+  if (manage && typeof id === 'string' && id.length >= 16) {
+    if (await callGuestsApi('update', { id, guest: data })) {
+      cloud = true
     }
-    if (guest.id && typeof guest.id === 'string' && guest.id.length >= 16) {
-      await db.collection('guests').doc(guest.id).update({ data })
-    } else {
-      const res = await db.collection('guests').add({
-        data: { ...data, createdAt: db.serverDate() }
-      })
-      if (res._id) {
-        if (idx >= 0) {
-          guests[idx].id = res._id
+  } else if (manage) {
+    const r = await callGuestsApi('add', { guest: data })
+    if (r && r.id) {
+      id = r.id
+      cloud = true
+    }
+  }
+
+  // 2) 云函数不可用：回退客户端直连（仅能写本机创建的记录）
+  if (!cloud && cloudReady) {
+    const db = getDb()
+    if (db) {
+      try {
+        if (typeof id === 'string' && id.length >= 16) {
+          await db
+            .collection('guests')
+            .doc(id)
+            .update({ data: Object.assign({}, data, { updatedAt: db.serverDate() }) })
+          cloud = true
         } else {
-          guests[0].id = res._id
+          const res = await db
+            .collection('guests')
+            .add({ data: Object.assign({}, data, { createdAt: db.serverDate() }) })
+          if (res._id) {
+            id = res._id
+            cloud = true
+          }
         }
-        setGuestsLocal(guests)
+      } catch (e) {
+        console.log('云端名单写入失败，已保存在本地', e)
       }
     }
-    return { ok: true, cloud: true, list: guests }
-  } catch (e) {
-    console.log('云端名单写入失败，已保存在本地', e)
-    return { ok: true, cloud: false, list: guests }
   }
+
+  // 3) 本地记录同步（云端 add 换了 _id 时，把旧数字 id 记录替换掉）
+  const guests = getGuestsLocal()
+  if (String(id) !== String(guest.id)) {
+    const oldIdx = guests.findIndex((g) => String(g.id) === String(guest.id))
+    if (oldIdx >= 0) {
+      guests.splice(oldIdx, 1)
+    }
+  }
+  const record = Object.assign({}, guest, { id })
+  const idx = guests.findIndex((g) => String(g.id) === String(id))
+  if (idx >= 0) {
+    guests[idx] = record
+  } else {
+    guests.unshift(record)
+  }
+  setGuestsLocal(guests)
+  return { ok: true, cloud, list: guests }
 }
 
 async function removeGuestAsync(id) {
-  const guests = getGuestsLocal().filter((g) => g.id !== id)
-  setGuestsLocal(guests)
-  const db = getDb()
-  if (!db) {
-    return { ok: true, cloud: false, list: guests }
-  }
-  try {
-    if (typeof id === 'string' && id.length >= 16) {
-      await db.collection('guests').doc(id).remove()
+  // dataset 传参在部分机型会把数字 id 转成字符串，统一按字符串比较，避免漏删
+  const sid = String(id)
+  let cloud = false
+
+  // 1) 云函数优先：云端权限删除（数字 id 是纯本地记录，云端本来就没有，跳过）
+  if (typeof id === 'string' && id.length >= 16) {
+    if (await callGuestsApi('remove', { id })) {
+      cloud = true
+      // 云端真删掉了，清掉这条墓碑
+      setDeletedGuestIds(getDeletedGuestIds().filter((d) => d !== sid))
     }
-    return { ok: true, cloud: true, list: guests }
-  } catch (e) {
-    console.log('云端名单删除失败，已在本地删除', e)
-    return { ok: true, cloud: false, list: guests }
   }
+
+  // 2) 云函数不可用：回退直连（仅创建者权限，别人的记录删不掉）
+  if (!cloud && cloudReady && typeof id === 'string' && id.length >= 16) {
+    const db = getDb()
+    if (db) {
+      try {
+        await db.collection('guests').doc(id).remove()
+        cloud = true
+      } catch (e) {
+        console.log('云端名单删除失败（权限受限）', e)
+      }
+    }
+  }
+
+  // 3) 云端删不掉时记墓碑：本机拉取时不再显示，防止删除后又被拉回来
+  if (!cloud) {
+    const deleted = getDeletedGuestIds()
+    if (deleted.indexOf(sid) < 0) {
+      deleted.unshift(sid)
+      setDeletedGuestIds(deleted)
+    }
+  }
+
+  const guests = getGuestsLocal().filter((g) => String(g.id) !== sid)
+  setGuestsLocal(guests)
+  return { ok: true, cloud, list: guests }
 }
 
 module.exports = {

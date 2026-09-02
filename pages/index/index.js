@@ -21,6 +21,12 @@ Page({
     },
     blessings: [],
     blessingsLoading: true,
+    wallList: [],
+    wallLoop: false,
+    wallPaused: false,
+    wallHeight: null,
+    wallShift: 0,
+    wallDuration: 0,
     latestBlessingId: 0,
     wedding: {},
     shareImage: '',
@@ -270,9 +276,16 @@ Page({
   onInnerTouchStart(e) {
     this._innerY = e.touches[0].clientY
     this._innerX = e.touches[0].clientX
+    // 循环滚动中：按下时暂停，方便手动查看
+    if (e.currentTarget.dataset.view === 'wall' && this.data.wallLoop) {
+      this.setData({ wallPaused: true })
+    }
   },
 
   onInnerTouchEnd(e) {
+    if (e.currentTarget.dataset.view === 'wall' && this.data.wallLoop) {
+      this.setData({ wallPaused: false })
+    }
     const view = e.currentTarget.dataset.view
     const dy = (this._innerY || 0) - e.changedTouches[0].clientY
     const dx = Math.abs((this._innerX || 0) - e.changedTouches[0].clientX)
@@ -367,11 +380,11 @@ Page({
 
     const result = await storage.addBlessingAsync(blessing)
     this.setData({
-      blessings: result.list,
       formData: { name: '', count: '', message: '' },
       latestBlessingId: blessing.id,
       cloudTip: result.cloud ? '已同步云数据库' : '已永久保存在本地（开通云开发后可同步）'
     })
+    this.applyBlessings(result.list)
 
     await storage.upsertGuestAsync({
       id: Date.now() + 1,
@@ -391,7 +404,50 @@ Page({
 
   async loadBlessings() {
     const blessings = await storage.loadBlessingsAsync()
-    this.setData({ blessings, blessingsLoading: false })
+    this.setData({ blessingsLoading: false })
+    this.applyBlessings(blessings)
+  },
+
+  // 祝福墙：超过 3 条时固定高度并循环滚动，否则保持内容自适应
+  applyBlessings(list) {
+    const loop = list.length > 3
+    // 循环时列表翻倍实现无缝衔接，_k 保证翻倍后 key 仍唯一
+    const wallList = list
+      .concat(loop ? list : [])
+      .map((item, i) => Object.assign({}, item, { _k: i }))
+    this.setData({
+      blessings: list,
+      wallList: wallList,
+      wallLoop: loop
+    }, () => {
+      if (loop) {
+        this.setupWallLoop()
+      } else {
+        this.setData({ wallHeight: null, wallShift: 0, wallDuration: 0 })
+      }
+    })
+  },
+
+  // 量取前 3 条的总高作为墙的固定高度，并按内容高度计算循环位移与时长
+  setupWallLoop() {
+    setTimeout(() => {
+      const q = this.createSelectorQuery()
+      q.selectAll('#body-wall .blessing-item').boundingClientRect()
+      q.exec((res) => {
+        const rects = res && res[0]
+        if (!rects || rects.length < 6) {
+          return
+        }
+        const wallHeight = rects[2].bottom - rects[0].top
+        const shift = rects[rects.length / 2].top - rects[0].top
+        this.setData({
+          wallHeight,
+          wallShift: shift,
+          // 约 25px/s 匀速滚动，位移越大转得越久
+          wallDuration: Math.max(10, Math.round(shift / 25))
+        })
+      })
+    }, 80)
   },
 
   // —— 背景音乐：打开小程序默认自动播放 ——
