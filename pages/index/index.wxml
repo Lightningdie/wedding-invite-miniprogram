@@ -253,7 +253,6 @@
           <scroll-view
             class="inner-scroll blessing-wall-scroll"
             id="scroll-wall"
-            style="{{wallHeight ? 'height:' + wallHeight + 'px' : ''}}"
             scroll-y
             enhanced
             show-scrollbar="{{false}}"

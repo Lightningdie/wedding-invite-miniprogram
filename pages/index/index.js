@@ -24,7 +24,6 @@ Page({
     wallList: [],
     wallLoop: false,
     wallPaused: false,
-    wallHeight: null,
     wallShift: 0,
     wallDuration: 0,
     latestBlessingId: 0,
@@ -423,12 +422,12 @@ Page({
       if (loop) {
         this.setupWallLoop()
       } else {
-        this.setData({ wallHeight: null, wallShift: 0, wallDuration: 0 })
+        this.setData({ wallShift: 0, wallDuration: 0 })
       }
     })
   },
 
-  // 量取前 3 条的总高作为墙的固定高度，并按内容高度计算循环位移与时长
+  // 量取列表内容总高，计算循环位移与时长（墙高由 CSS 固定，不随内容变化）
   setupWallLoop() {
     setTimeout(() => {
       const q = this.createSelectorQuery()
@@ -438,10 +437,8 @@ Page({
         if (!rects || rects.length < 6) {
           return
         }
-        const wallHeight = rects[2].bottom - rects[0].top
         const shift = rects[rects.length / 2].top - rects[0].top
         this.setData({
-          wallHeight,
           wallShift: shift,
           // 约 25px/s 匀速滚动，位移越大转得越久
           wallDuration: Math.max(10, Math.round(shift / 25))

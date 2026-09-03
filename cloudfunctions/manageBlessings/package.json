@@ -1,0 +1,9 @@
+{
+  "name": "manageBlessings",
+  "version": "1.0.0",
+  "description": "祝福留言云端管理：绕过「仅创建者可读写」权限，管理页对 blessings 集合真正的改删清空",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

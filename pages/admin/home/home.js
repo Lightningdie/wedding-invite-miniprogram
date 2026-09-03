@@ -40,5 +40,9 @@ Page({
 
   goGuests() {
     wx.navigateTo({ url: '/pages/admin/guests/guests' })
+  },
+
+  goBlessings() {
+    wx.navigateTo({ url: '/pages/admin/blessings/blessings' })
   }
 })

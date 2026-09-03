@@ -1050,12 +1050,14 @@
 /* 祝福墙按内容自适应高度，超出上限内部滚动，把剩余空间留给均匀间距 */
 .blessing-wall {
   flex: 0 1 auto;
-  max-height: 40vh;
+  max-height: 23vh;
   display: flex;
   flex-direction: column;
 }
 
 .blessing-wall-scroll {
+  /* 固定高：约 3 条单行留言，留言增减不改变墙高 */
+  height: 384rpx;
   min-height: 160rpx;
 }
 
@@ -1135,7 +1137,7 @@
   .invite-filler { margin-top: 28rpx; }
   .form-textarea { height: 100rpx; }
   .footer-mini { padding-top: 14rpx; }
-  .blessing-wall-scroll { min-height: 120rpx; }
+  .blessing-wall-scroll { height: 320rpx; }
   /* 插画同步缩小，保证每页完整显示 */
   .deco-cats { width: 148rpx; height: 140rpx; margin-bottom: 16rpx; }
   .deco-bouquet { width: 108rpx; height: 153rpx; }

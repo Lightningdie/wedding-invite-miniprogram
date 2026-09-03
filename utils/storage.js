@@ -10,6 +10,8 @@ const KEY_BLESSINGS = 'blessings'
 const KEY_GUESTS = 'guest_list'
 // 已删除宾客 id 墓碑：云端记录受「仅创建者可读写」权限限制删不掉时，防止下次从云端拉取时复活
 const KEY_GUEST_DELETED = 'guest_deleted_ids'
+// 已删除留言 id 墓碑：同上，留言管理页删除失败时本机保持隐藏
+const KEY_BLESS_DELETED = 'blessing_deleted_ids'
 const DOC_WEDDING_ID = 'main'
 
 // 静态托管域名（媒体资源最终地址）与历史 cloud:// 文件名 -> 现名的映射
@@ -200,6 +202,19 @@ function setDeletedGuestIds(list) {
   wx.setStorageSync(KEY_GUEST_DELETED, list || [])
 }
 
+// 已删除留言 id 列表（统一存字符串，与宾客墓碑同理）
+function getDeletedBlessingIds() {
+  try {
+    return (wx.getStorageSync(KEY_BLESS_DELETED) || []).map(String)
+  } catch (e) {
+    return []
+  }
+}
+
+function setDeletedBlessingIds(list) {
+  wx.setStorageSync(KEY_BLESS_DELETED, list || [])
+}
+
 function getWedding() {
   return getWeddingLocal()
 }
@@ -270,19 +285,32 @@ async function saveWeddingCloud(config) {
 
 async function loadBlessingsAsync() {
   const local = getBlessingsLocal()
+  const deleted = getDeletedBlessingIds()
+  const mapRow = (item) => ({
+    id: item._id || item.id,
+    name: item.name,
+    count: item.count,
+    message: item.message,
+    time: item.time
+  })
+
+  // 云函数优先：全量拉取（绕过权限）；墓碑过滤兜底历史删除失败的记录
+  const viaFn = await callBlessingsApi('list')
+  if (viaFn && viaFn.list) {
+    const list = viaFn.list.map(mapRow).filter((b) => deleted.indexOf(String(b.id)) < 0)
+    setBlessingsLocal(list)
+    return list
+  }
+
   const db = getDb()
   if (!db) {
     return local
   }
   try {
     const res = await db.collection('blessings').orderBy('createdAt', 'desc').limit(100).get()
-    const list = (res.data || []).map((item) => ({
-      id: item._id,
-      name: item.name,
-      count: item.count,
-      message: item.message,
-      time: item.time
-    }))
+    const list = (res.data || [])
+      .map(mapRow)
+      .filter((b) => deleted.indexOf(String(b.id)) < 0)
     if (list.length > 0) {
       setBlessingsLocal(list)
       return list
@@ -341,6 +369,28 @@ async function callGuestsApi(action, payload) {
     console.log('manageGuests 拒绝请求', result && result.error)
   } catch (e) {
     console.log('manageGuests 云函数不可用，回退直连', e)
+  }
+  return null
+}
+
+// 云函数 manageBlessings（管理端专用）：与管理函数同款约定，绕过「仅创建者可读写」，
+// 让留言管理界面的改删清空真正落到云数据库；函数未部署/失败时返回 null 走回退链
+async function callBlessingsApi(action, payload) {
+  if (!cloudReady || !wx.cloud.callFunction) {
+    return null
+  }
+  try {
+    const res = await wx.cloud.callFunction({
+      name: 'manageBlessings',
+      data: Object.assign({ action }, payload || {})
+    })
+    const result = res && res.result
+    if (result && result.ok) {
+      return result
+    }
+    console.log('manageBlessings 拒绝请求', result && result.error)
+  } catch (e) {
+    console.log('manageBlessings 云函数不可用，回退直连', e)
   }
   return null
 }
@@ -513,6 +563,107 @@ async function removeGuestAsync(id) {
   return { ok: true, cloud, list: guests }
 }
 
+async function updateBlessingAsync(blessing) {
+  const data = {
+    name: blessing.name,
+    count: Number(blessing.count) || 1,
+    message: blessing.message,
+    time: blessing.time || ''
+  }
+  let cloud = false
+  const sid = String(blessing.id)
+
+  // 1) 云函数优先：云端权限可改任何人的记录（数字 id 是纯本地记录，云端没有，跳过）
+  if (typeof blessing.id === 'string' && blessing.id.length >= 16) {
+    if (await callBlessingsApi('update', { id: blessing.id, blessing: data })) {
+      cloud = true
+    } else if (cloudReady) {
+      // 2) 云函数不可用：回退直连（仅能改本机创建的记录）
+      const db = getDb()
+      if (db) {
+        try {
+          await db.collection('blessings').doc(blessing.id).update({ data })
+          cloud = true
+        } catch (e) {
+          console.log('云端祝福更新失败', e)
+        }
+      }
+    }
+  }
+
+  // 3) 本地同步：界面上立即生效
+  const list = getBlessingsLocal().map((b) => {
+    return String(b.id) === sid ? Object.assign({}, b, data) : b
+  })
+  setBlessingsLocal(list)
+  return { ok: true, cloud, list }
+}
+
+async function removeBlessingAsync(id) {
+  // dataset 传参在部分机型会把数字 id 转成字符串，统一按字符串比较，避免漏删
+  const sid = String(id)
+  let cloud = false
+
+  // 1) 云函数优先：云端权限删除；真删掉则清掉这条墓碑
+  if (typeof id === 'string' && id.length >= 16) {
+    if (await callBlessingsApi('remove', { id })) {
+      cloud = true
+      setDeletedBlessingIds(getDeletedBlessingIds().filter((d) => d !== sid))
+    }
+  }
+
+  // 2) 云函数不可用：回退直连（仅创建者权限，别人的记录删不掉）
+  if (!cloud && cloudReady && typeof id === 'string' && id.length >= 16) {
+    const db = getDb()
+    if (db) {
+      try {
+        await db.collection('blessings').doc(id).remove()
+        cloud = true
+      } catch (e) {
+        console.log('云端祝福删除失败（权限受限）', e)
+      }
+    }
+  }
+
+  // 3) 云端删不掉时记墓碑：本机拉取时不再显示，防止删除后又被拉回来
+  if (!cloud) {
+    const deleted = getDeletedBlessingIds()
+    if (deleted.indexOf(sid) < 0) {
+      deleted.unshift(sid)
+      setDeletedBlessingIds(deleted)
+    }
+  }
+
+  const list = getBlessingsLocal().filter((b) => String(b.id) !== sid)
+  setBlessingsLocal(list)
+  return { ok: true, cloud, list }
+}
+
+async function clearBlessingsAsync() {
+  let cloud = false
+  const locals = getBlessingsLocal()
+
+  // 1) 云函数优先：云端权限清空整集合
+  if (await callBlessingsApi('clear')) {
+    cloud = true
+  }
+
+  // 2) 云函数不可用时：直连删不掉别人的记录，全部记墓碑保持隐藏，防止拉取时复活
+  if (!cloud) {
+    const deleted = getDeletedBlessingIds()
+    locals.forEach((b) => {
+      const sid = String(b.id)
+      if (typeof b.id === 'string' && b.id.length >= 16 && deleted.indexOf(sid) < 0) {
+        deleted.unshift(sid)
+      }
+    })
+    setDeletedBlessingIds(deleted)
+  }
+
+  setBlessingsLocal([])
+  return { ok: true, cloud, list: [] }
+}
+
 module.exports = {
   initCloud,
   isCloudReady,
@@ -526,6 +677,9 @@ module.exports = {
   loadBlessingsAsync,
   loadGuestsAsync,
   addBlessingAsync,
+  updateBlessingAsync,
+  removeBlessingAsync,
+  clearBlessingsAsync,
   upsertGuestAsync,
   removeGuestAsync,
   padZero,

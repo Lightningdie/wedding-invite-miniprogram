@@ -1,0 +1,42 @@
+<!--pages/admin/blessings/blessings.wxml-->
+<view class="blessings-page">
+  <view class="toolbar">
+    <view class="summary">共 {{blessings.length}} 条祝福</view>
+    <button class="clear-btn" size="mini" bindtap="clearAll">清空</button>
+  </view>
+
+  <view class="empty" wx:if="{{blessings.length === 0}}">暂无祝福留言</view>
+
+  <view class="blessing-item" wx:for="{{blessings}}" wx:key="id">
+    <view class="blessing-main">
+      <view class="blessing-row">
+        <text class="blessing-name">{{item.name}}</text>
+        <text class="blessing-time">{{item.time}}</text>
+      </view>
+      <view class="blessing-msg">{{item.message}}</view>
+    </view>
+    <view class="blessing-actions">
+      <text class="action" data-id="{{item.id}}" bindtap="openEdit">编辑</text>
+      <text class="action danger" data-id="{{item.id}}" bindtap="removeBlessing">删除</text>
+    </view>
+  </view>
+
+  <!-- 编辑弹层 -->
+  <view class="mask" wx:if="{{showForm}}" bindtap="closeForm"></view>
+  <view class="sheet" wx:if="{{showForm}}">
+    <view class="sheet-title">编辑留言</view>
+    <view class="form-group">
+      <view class="label">姓名</view>
+      <input class="input" value="{{form.name}}" data-field="name" bindinput="onFormInput" />
+    </view>
+    <view class="form-group">
+      <view class="label">人数</view>
+      <input class="input" type="number" value="{{form.count}}" data-field="count" bindinput="onFormInput" />
+    </view>
+    <view class="form-group">
+      <view class="label">留言内容</view>
+      <textarea class="textarea" value="{{form.message}}" data-field="message" bindinput="onFormInput" maxlength="200" auto-height></textarea>
+    </view>
+    <button class="save-btn" bindtap="saveBlessing">保存</button>
+  </view>
+</view>

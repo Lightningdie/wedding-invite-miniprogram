@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/admin/home/home",
     "pages/admin/edit/edit",
-    "pages/admin/guests/guests"
+    "pages/admin/guests/guests",
+    "pages/admin/blessings/blessings"
   ],
   "window": {
     "backgroundTextStyle": "light",
