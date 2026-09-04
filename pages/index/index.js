@@ -359,6 +359,19 @@ Page({
   },
 
   async submitBlessing() {
+    // 提交期间忽略连点，避免同一人重复提交祝福与宾客登记
+    if (this._submitting) {
+      return
+    }
+    this._submitting = true
+    try {
+      await this.doSubmitBlessing()
+    } finally {
+      this._submitting = false
+    }
+  },
+
+  async doSubmitBlessing() {
     const { name, count, message } = this.data.formData
     if (!name.trim()) {
       wx.showToast({ title: '请输入您的姓名', icon: 'none' })
@@ -437,7 +450,11 @@ Page({
         if (!rects || rects.length < 6) {
           return
         }
-        const shift = rects[rects.length / 2].top - rects[0].top
+        const mid = rects[Math.floor(rects.length / 2)]
+        if (!mid) {
+          return
+        }
+        const shift = mid.top - rects[0].top
         this.setData({
           wallShift: shift,
           // 约 25px/s 匀速滚动，位移越大转得越久
@@ -472,7 +489,7 @@ Page({
       if (!music.getPlaying()) {
         this.setData({ musicOn: false })
       }
-    }, 400)
+    }, 800)
   },
 
   onToggleMusic() {
@@ -499,15 +516,12 @@ Page({
       return
     }
 
+    // 800ms 后仍没播起来（网络慢/资源缺失）只回正按钮状态，不弹失败提示打扰宾客
     setTimeout(() => {
       if (!music.getPlaying()) {
         this.setData({ musicOn: false })
-        wx.showToast({
-          title: '背景音乐加载失败，请稍后再试',
-          icon: 'none'
-        })
       }
-    }, 400)
+    }, 800)
   },
 
   goAdmin() {

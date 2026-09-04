@@ -1,0 +1,9 @@
+{
+  "name": "manageConfig",
+  "version": "1.0.0",
+  "description": "婚礼配置云端管理（管理页专用）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

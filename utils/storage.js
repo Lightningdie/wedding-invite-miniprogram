@@ -12,6 +12,9 @@ const KEY_GUESTS = 'guest_list'
 const KEY_GUEST_DELETED = 'guest_deleted_ids'
 // 已删除留言 id 墓碑：同上，留言管理页删除失败时本机保持隐藏
 const KEY_BLESS_DELETED = 'blessing_deleted_ids'
+// 云端留言「已清空」标记：区分「云端真的被清空」与「云端异常为空（环境重置/误清）」，
+// 后者保留本地数据，避免云端意外清空连带损失本机留言
+const KEY_BLESS_CLEARED = 'blessing_cloud_cleared'
 const DOC_WEDDING_ID = 'main'
 
 // 静态托管域名（媒体资源最终地址）与历史 cloud:// 文件名 -> 现名的映射
@@ -119,6 +122,14 @@ function mergeWedding(saved) {
   // 地图导航功能已移除，清理旧配置里遗留的经纬度
   delete merged.latitude
   delete merged.longitude
+  // 数组字段防损坏：存档里被写成非数组时整体回退默认，避免损坏值透传到页面渲染
+  const useArrayOr = (v, fallback) => (Array.isArray(v) ? v : fallback)
+  merged.inviteLines = useArrayOr(merged.inviteLines, DEFAULT_WEDDING.inviteLines)
+  merged.inviteFiller = useArrayOr(merged.inviteFiller, DEFAULT_WEDDING.inviteFiller)
+  merged.stories = useArrayOr(merged.stories, DEFAULT_WEDDING.stories)
+  merged.transportTips = useArrayOr(merged.transportTips, DEFAULT_WEDDING.transportTips)
+  merged.photos = useArrayOr(merged.photos, DEFAULT_WEDDING.photos.map((p) => ({ ...p })))
+  merged.timeline = useArrayOr(merged.timeline, DEFAULT_WEDDING.timeline.map((t) => ({ ...t })))
   // 照片逐张校验：先迁移 cloud://，无效地址按同序号默认照片回填，越界的无效条目丢弃
   if (Array.isArray(merged.photos)) {
     merged.photos = merged.photos
@@ -215,6 +226,19 @@ function setDeletedBlessingIds(list) {
   wx.setStorageSync(KEY_BLESS_DELETED, list || [])
 }
 
+// 云端「已清空」标记（时间戳）：clearBlessingsAsync 成功后落盘
+function getBlessingClearFlag() {
+  try {
+    return wx.getStorageSync(KEY_BLESS_CLEARED) || 0
+  } catch (e) {
+    return 0
+  }
+}
+
+function setBlessingClearFlag() {
+  wx.setStorageSync(KEY_BLESS_CLEARED, Date.now())
+}
+
 function getWedding() {
   return getWeddingLocal()
 }
@@ -298,6 +322,11 @@ async function loadBlessingsAsync() {
   const viaFn = await callBlessingsApi('list')
   if (viaFn && viaFn.list) {
     const list = viaFn.list.map(mapRow).filter((b) => deleted.indexOf(String(b.id)) < 0)
+    // 云端为空且没有「已清空」标记时视为异常（环境重置/误清），保留本地数据防丢失
+    if (list.length === 0 && !getBlessingClearFlag() && local.length > 0) {
+      console.log('云端留言异常为空，保留本地数据')
+      return local
+    }
     setBlessingsLocal(list)
     return list
   }
@@ -393,6 +422,55 @@ async function callBlessingsApi(action, payload) {
     console.log('manageBlessings 云函数不可用，回退直连', e)
   }
   return null
+}
+
+// 云函数 manageConfig（管理端专用）：与管理函数同款约定，
+// 「恢复默认」时删除云端 wedding_config.main 文档用
+async function callConfigApi(action) {
+  if (!cloudReady || !wx.cloud.callFunction) {
+    return null
+  }
+  try {
+    const res = await wx.cloud.callFunction({
+      name: 'manageConfig',
+      data: { action: action }
+    })
+    const result = res && res.result
+    if (result && result.ok) {
+      return result
+    }
+    console.log('manageConfig 拒绝请求', result && result.error)
+  } catch (e) {
+    console.log('manageConfig 云函数不可用，回退直连', e)
+  }
+  return null
+}
+
+// 「恢复默认」：云端文档与本地存档一并清掉（只删本地会被云值重新覆盖，重置形同虚设）
+async function resetWeddingAsync() {
+  let cloud = false
+  // 1) 云函数优先：云端权限删配置（doc 兼存 adminOpenId，删掉后下次云端调用重新登记管理员）
+  if (await callConfigApi('clear')) {
+    cloud = true
+  } else if (cloudReady) {
+    // 2) 云函数不可用：回退直连（doc 为本机创建时才能删掉）
+    const db = getDb()
+    if (db) {
+      try {
+        await db.collection('wedding_config').doc(DOC_WEDDING_ID).remove()
+        cloud = true
+      } catch (e) {
+        console.log('云端婚礼配置删除失败', e)
+      }
+    }
+  }
+  // 3) 本地存档必清
+  try {
+    wx.removeStorageSync(KEY_WEDDING)
+  } catch (e) {
+    console.log('本地婚礼配置清除失败', e)
+  }
+  return { ok: true, cloud }
 }
 
 async function loadGuestsAsync() {
@@ -643,9 +721,10 @@ async function clearBlessingsAsync() {
   let cloud = false
   const locals = getBlessingsLocal()
 
-  // 1) 云函数优先：云端权限清空整集合
+  // 1) 云函数优先：云端权限清空整集合，成功后落「已清空」标记
   if (await callBlessingsApi('clear')) {
     cloud = true
+    setBlessingClearFlag()
   }
 
   // 2) 云函数不可用时：直连删不掉别人的记录，全部记墓碑保持隐藏，防止拉取时复活
@@ -675,6 +754,7 @@ module.exports = {
   setGuests,
   loadWeddingAsync,
   loadBlessingsAsync,
+  resetWeddingAsync,
   loadGuestsAsync,
   addBlessingAsync,
   updateBlessingAsync,

@@ -59,13 +59,17 @@ Page({
   resetForm() {
     wx.showModal({
       title: '确认恢复默认？',
-      success: (res) => {
+      success: async (res) => {
         if (!res.confirm) {
           return
         }
-        wx.removeStorageSync('wedding_config')
-        this.loadForm()
-        wx.showToast({ title: '已恢复默认', icon: 'none' })
+        // 云端文档与本地存档一并清掉：只删本地会被云值重新覆盖，重置形同虚设
+        const result = await storage.resetWeddingAsync()
+        await this.loadForm()
+        wx.showToast({
+          title: result.cloud ? '已恢复默认' : '已清除本地（云端配置受限）',
+          icon: 'none'
+        })
       }
     })
   }
