@@ -235,8 +235,8 @@ function getBlessingClearFlag() {
   }
 }
 
-function setBlessingClearFlag() {
-  wx.setStorageSync(KEY_BLESS_CLEARED, Date.now())
+function setBlessingClearFlag(ts) {
+  wx.setStorageSync(KEY_BLESS_CLEARED, ts || Date.now())
 }
 
 function getWedding() {
@@ -322,10 +322,21 @@ async function loadBlessingsAsync() {
   const viaFn = await callBlessingsApi('list')
   if (viaFn && viaFn.list) {
     const list = viaFn.list.map(mapRow).filter((b) => deleted.indexOf(String(b.id)) < 0)
-    // 云端为空且没有「已清空」标记时视为异常（环境重置/误清），保留本地数据防丢失
-    if (list.length === 0 && !getBlessingClearFlag() && local.length > 0) {
-      console.log('云端留言异常为空，保留本地数据')
-      return local
+    if (list.length === 0) {
+      const seen = getBlessingClearFlag()
+      const clearedAt = viaFn.clearedAt || 0
+      if (clearedAt && clearedAt > seen) {
+        // 后台（别的设备）清空了云端：本机缓存一并清掉并记住标记时间，留言墙跟着变化
+        console.log('云端留言已被清空，同步清空本地缓存')
+        setBlessingsLocal([])
+        setBlessingClearFlag(clearedAt)
+        return []
+      }
+      // 云端为空且没有任何清空事件时视为异常（环境重置/误清），保留本地数据防丢失
+      if (!seen && local.length > 0) {
+        console.log('云端留言异常为空，保留本地数据')
+        return local
+      }
     }
     setBlessingsLocal(list)
     return list
@@ -641,6 +652,29 @@ async function removeGuestAsync(id) {
   return { ok: true, cloud, list: guests }
 }
 
+// 清空全部宾客：云端云函数清空优先；不可用时把云端 id 全记墓碑防止拉取复活，
+// 本地列表无论如何都清掉（与 clearBlessingsAsync 同一套路）
+async function clearGuestsAsync() {
+  let cloud = false
+  if (await callGuestsApi('clear')) {
+    cloud = true
+  }
+
+  if (!cloud) {
+    const deleted = getDeletedGuestIds()
+    getGuestsLocal().forEach((g) => {
+      const sid = String(g.id)
+      if (typeof g.id === 'string' && g.id.length >= 16 && deleted.indexOf(sid) < 0) {
+        deleted.unshift(sid)
+      }
+    })
+    setDeletedGuestIds(deleted)
+  }
+
+  setGuestsLocal([])
+  return { ok: true, cloud, list: [] }
+}
+
 async function updateBlessingAsync(blessing) {
   const data = {
     name: blessing.name,
@@ -721,10 +755,11 @@ async function clearBlessingsAsync() {
   let cloud = false
   const locals = getBlessingsLocal()
 
-  // 1) 云函数优先：云端权限清空整集合，成功后落「已清空」标记
-  if (await callBlessingsApi('clear')) {
+  // 1) 云函数优先：云端权限清空整集合，成功后记住云端事件时间（其他设备据此同步）
+  const cleared = await callBlessingsApi('clear')
+  if (cleared) {
     cloud = true
-    setBlessingClearFlag()
+    setBlessingClearFlag(cleared.clearedAt || Date.now())
   }
 
   // 2) 云函数不可用时：直连删不掉别人的记录，全部记墓碑保持隐藏，防止拉取时复活
@@ -762,6 +797,7 @@ module.exports = {
   clearBlessingsAsync,
   upsertGuestAsync,
   removeGuestAsync,
+  clearGuestsAsync,
   padZero,
   formatTime,
   DEFAULT_WEDDING

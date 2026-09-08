@@ -671,7 +671,7 @@
 
 /* 第三行（喜宴开席）icon 放大：scale 不占布局，右侧英文与左侧文字位置都不动 */
 .tl-ic-lg {
-  transform: scale(1.6);
+  transform: scale(1.3);
 }
 
 .tl-en {

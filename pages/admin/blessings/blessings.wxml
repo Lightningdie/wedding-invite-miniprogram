@@ -37,6 +37,9 @@
       <view class="label">留言内容</view>
       <textarea class="textarea" value="{{form.message}}" data-field="message" bindinput="onFormInput" maxlength="200" auto-height></textarea>
     </view>
-    <button class="save-btn" bindtap="saveBlessing">保存</button>
+    <view class="sheet-actions">
+      <button class="reset-btn" bindtap="clearForm">清空</button>
+      <button class="save-btn" bindtap="saveBlessing">保存</button>
+    </view>
   </view>
 </view>

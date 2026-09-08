@@ -147,13 +147,31 @@
   border: 1rpx solid #F0E6D0;
 }
 
-.save-btn {
+.sheet-actions {
+  display: flex;
+  gap: 20rpx;
   margin-top: 16rpx;
+}
+
+.save-btn {
+  flex: 1;
+  margin-top: 0;
   background: linear-gradient(135deg, #D4AF37 0%, #C4A030 100%);
   color: #fff;
   border-radius: 50rpx;
 }
 
 .save-btn::after {
+  border: none;
+}
+
+.reset-btn {
+  flex: 1;
+  background: #fff !important;
+  color: #C07070 !important;
+  border-radius: 50rpx;
+}
+
+.reset-btn::after {
   border: none;
 }

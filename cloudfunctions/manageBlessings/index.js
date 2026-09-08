@@ -9,7 +9,7 @@
  *   list    拉取全部留言（按创建时间倒序）
  *   update  按 _id 更新留言
  *   remove  按 _id 删除留言
- *   clear   清空全部留言
+ *   clear   清空全部留言（写入 clearedAt 标记供各端同步）
  *
  * 管理员识别：与管理页共用 wedding_config.main.adminOpenId，
  * 首位调用者自动登记为管理员，此后仅管理员可操作。
@@ -39,6 +39,30 @@ async function ensureAdmin(openid) {
   return true
 }
 
+// 清空事件标记（wedding_config.blessings_cleared.clearedAt）：
+// 管理端清空云端后写入，其他设备拉取时发现标记比本地记录的新，
+// 就同步清掉本机留言缓存，保证各端留言展示区跟着变化
+async function readClearedAt() {
+  try {
+    const doc = (await db.collection('wedding_config').doc('blessings_cleared').get()).data
+    return (doc && doc.clearedAt) || 0
+  } catch (e) {
+    return 0 // 标记文档不存在，视为从未清空
+  }
+}
+
+async function writeClearedAt() {
+  const ts = Date.now()
+  try {
+    await db.collection('wedding_config').doc('blessings_cleared').set({
+      data: { clearedAt: ts }
+    })
+  } catch (e) {
+    console.log('清空标记写入失败', e)
+  }
+  return ts
+}
+
 function pickBlessing(b) {
   b = b || {}
   return {
@@ -61,7 +85,7 @@ exports.main = async (event) => {
 
     if (action === 'list') {
       const res = await col.orderBy('createdAt', 'desc').limit(1000).get()
-      return { ok: true, list: res.data }
+      return { ok: true, list: res.data, clearedAt: await readClearedAt() }
     }
     if (action === 'update') {
       const data = Object.assign(pickBlessing(event.blessing), { updatedAt: db.serverDate() })
@@ -87,7 +111,8 @@ exports.main = async (event) => {
           break
         }
       }
-      return { ok: true }
+      const clearedAt = await writeClearedAt()
+      return { ok: true, clearedAt }
     }
     return { ok: false, error: '未知操作 ' + action }
   } catch (e) {

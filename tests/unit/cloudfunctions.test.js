@@ -60,6 +60,17 @@ describe('云函数 manageGuests', () => {
     assert.equal(list2.list[0].name, '李四')
   })
 
+  it('clear 清空全部宾客', async () => {
+    h.state.openid = 'openid-A'
+    for (let i = 0; i < 5; i++) {
+      await main({ action: 'add', guest: { name: '客' + i } })
+    }
+    const res = await main({ action: 'clear' })
+    assert.equal(res.ok, true)
+    const list = await main({ action: 'list' })
+    assert.equal(list.list.length, 0)
+  })
+
   it('未知 action 返回错误信息', async () => {
     h.state.openid = 'openid-A'
     const res = await main({ action: 'hack' })
@@ -170,7 +181,7 @@ describe('云函数 manageBlessings', () => {
     assert.equal(remain.data.length, 0)
   })
 
-  it('clear 分批清空 250 条留言', async () => {
+  it('clear 分批清空 250 条留言并写入 clearedAt 标记', async () => {
     await seedAdmin()
     for (let i = 0; i < 250; i++) {
       await db.collection('blessings').add({ data: { name: 'n' + i, count: 1, message: 'm' } })
@@ -179,6 +190,19 @@ describe('云函数 manageBlessings', () => {
     assert.equal(res.ok, true)
     const remain = await db.collection('blessings').get()
     assert.equal(remain.data.length, 0)
+    // 清空事件标记落库，供其他设备同步清空本地缓存
+    assert.ok(res.clearedAt > 0, 'clear 应返回 clearedAt')
+    const marker = await db.collection('wedding_config').doc('blessings_cleared').get()
+    assert.equal(marker.data.clearedAt, res.clearedAt)
+  })
+
+  it('list 返回清空标记 clearedAt（无标记时为 0）', async () => {
+    await seedAdmin()
+    const res1 = await main({ action: 'list' })
+    assert.equal(res1.clearedAt, 0, '从未清空过应为 0')
+    await db.collection('wedding_config').doc('blessings_cleared').set({ data: { clearedAt: 12345 } })
+    const res2 = await main({ action: 'list' })
+    assert.equal(res2.clearedAt, 12345)
   })
 
   it('非管理员 clear 被拒绝', async () => {

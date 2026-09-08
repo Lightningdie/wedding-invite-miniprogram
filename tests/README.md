@@ -27,6 +27,8 @@
 - 云端链路是集成式测试：客户端 storage.js 调 wx.cloud.callFunction 时，
   mock 会分发到真实云函数模块（共享同一 DbMock），完整覆盖
   「云函数 → 直连数据库 → 本地存储」三级回退。
+- 云端清空同步是集成验证的：manageBlessings clear 落 clearedAt 标记文档，
+  其他设备 loadBlessingsAsync 发现标记比本机记录的新，就同步清掉本地缓存。
 - 名称带「已知问题存档」的用例记录的是当前实际行为（含缺陷），
   修复后应同步改断言。
 - tests/ 已加入 project.config.json 的 packOptions.ignore，不会打进小程序包。

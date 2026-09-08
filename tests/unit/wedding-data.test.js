@@ -40,10 +40,10 @@ describe('data/wedding.js 默认配置校验（黑盒）', () => {
     DEFAULT.photos.forEach((p, i) => check(p.src, 'photos[' + i + '].src'))
   })
 
-  it('照片 8 张且地址不重复', () => {
-    assert.equal(DEFAULT.photos.length, 8)
+  it('照片 11 张且地址不重复', () => {
+    assert.equal(DEFAULT.photos.length, 11)
     const srcs = DEFAULT.photos.map((p) => p.src)
-    assert.equal(new Set(srcs).size, 8)
+    assert.equal(new Set(srcs).size, 11)
     DEFAULT.photos.forEach((p) => {
       assert.ok(p.title && p.desc)
     })

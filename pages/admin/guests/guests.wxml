@@ -2,7 +2,10 @@
 <view class="guests-page">
   <view class="toolbar">
     <view class="summary">共 {{guests.length}} 人 · 预计 {{totalCount}} 位出席</view>
-    <button class="add-btn" size="mini" bindtap="openAdd">添加</button>
+    <view class="toolbar-actions">
+      <button class="add-btn" size="mini" bindtap="openAdd">添加</button>
+      <button class="clear-btn" size="mini" bindtap="clearAll">清空</button>
+    </view>
   </view>
 
   <view class="empty" wx:if="{{guests.length === 0}}">暂无宾客，点击右上角添加</view>

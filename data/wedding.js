@@ -57,8 +57,8 @@ const DEFAULT_WEDDING = {
   timeline: [
     { time: '08:00', en: 'Guest Arrival', icon: '/assets/images/icons/icon-arrival.png', title: '迎宾签到', desc: '欢迎各位来宾莅临，签到留影' },
     { time: '08:30', en: 'Ceremony', icon: '/assets/images/icons/icon-ceremony.png', title: '婚礼典礼', desc: '新人入场，交换戒指，庄严宣誓' },
-    { time: '09:30', en: 'Banquet', icon: '/assets/images/icons/icon-banquet.png', title: '喜宴开席', desc: '美酒佳肴，共庆美好时刻' },
-    { time: '11:00', en: 'Photos', icon: '/assets/images/icons/icon-photos.png', title: '合影留念', desc: '与新人合影，记录美好瞬间' }
+    { time: '09:30', en: 'Photos', icon: '/assets/images/icons/icon-photos.png', title: '合影留念', desc: '与新人合影，记录美好瞬间' },
+    { time: '10:00', en: 'Banquet', icon: '/assets/images/icons/icon-banquet.png', title: '喜宴开席', desc: '美酒佳肴，共庆美好时刻' }
   ],
   photos: [
     { src: cdn('images/photoes/1.jpg'), title: '初次相遇', desc: '那一刻的心动，是故事的开始' },
@@ -68,7 +68,10 @@ const DEFAULT_WEDDING = {
     { src: cdn('images/photoes/5.jpg'), title: '约定一生', desc: '把最美的风景留给彼此' },
     { src: cdn('images/photoes/6.jpg'), title: '幸福将至', desc: '期待与你并肩走向礼堂' },
     { src: cdn('images/photoes/7.jpg'), title: '心动时刻', desc: '每个瞬间都值得珍藏' },
-    { src: cdn('images/photoes/8.jpg'), title: '爱的旅程', desc: '往后余生，请多指教' }
+    { src: cdn('images/photoes/8.jpg'), title: '爱的旅程', desc: '往后余生，请多指教' },
+    { src: cdn('images/photoes/9.jpg'), title: '佳偶天成', desc: '最美的祝福，是您的见证' },
+    { src: cdn('images/photoes/10.jpg'), title: '喜结良缘', desc: '愿所有美好都如约而至' },
+    { src: cdn('images/photoes/11.jpg'), title: '共赴喜宴', desc: '九月二十九，恭候您的光临' }
   ],
   stories: [
     {

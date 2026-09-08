@@ -161,6 +161,32 @@ describe('pages/index 黑盒：祝福提交与祝福墙', () => {
     assert.equal(h.state.wx.getStorageSync('guest_list').length, 1, '宾客也只登记一次')
   })
 
+  it('后台清空留言后回前台，留言展示区同步清空', async () => {
+    h.openCloudFunctions()
+    page = h.launchIndexPage()
+    await h.sleep(60)
+    const storage = require(h.ROOT + '/utils/storage.js')
+    // 本机先前拉取过 2 条留言并在祝福墙展示
+    storage.setBlessings([
+      { id: 'c0000000000000000001', name: '甲', count: 1, message: 'a', time: 't' },
+      { id: 'c0000000000000000002', name: '乙', count: 1, message: 'b', time: 't' }
+    ])
+    page.applyBlessings(storage.getBlessings())
+    assert.equal(page.data.blessings.length, 2)
+    // 后台（另一台设备）清空云端：云函数落 clearedAt 标记
+    const cleared = await h.state.wx.__state.cloudFunctions.manageBlessings({ action: 'clear' })
+    assert.ok(cleared.clearedAt > 0, 'clear 应返回 clearedAt')
+    // 回前台 onShow 重拉：云端标记比本机新 → 本机缓存一并清掉，墙跟着变
+    page.onShow()
+    await h.waitFor(() => page.data.blessings.length === 0)
+    assert.deepEqual(storage.getBlessings(), [], '本机留言缓存应同步清空')
+    assert.equal(
+      h.state.wx.getStorageSync('blessing_cloud_cleared'),
+      cleared.clearedAt,
+      '本机应记住云端清空时间，避免重复触发'
+    )
+  })
+
   it('祝福墙 3 条以内不循环，位移归零', async () => {
     page = h.launchIndexPage({ noCloud: true })
     await h.sleep(40)

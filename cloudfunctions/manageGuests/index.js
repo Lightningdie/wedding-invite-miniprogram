@@ -10,6 +10,7 @@
  *   add    新增宾客，返回云端 _id
  *   update 按 _id 更新宾客
  *   remove 按 _id 删除宾客
+ *   clear  清空全部宾客名单
  *
  * 管理员识别：只有管理页会调用本函数，首次调用者自动登记为管理员
  * （存于 wedding_config.main.adminOpenId），此后仅管理员可操作。
@@ -79,6 +80,23 @@ exports.main = async (event) => {
     }
     if (action === 'remove') {
       await col.doc(event.id).remove()
+      return { ok: true }
+    }
+    if (action === 'clear') {
+      // 分批删，单次 remove 全集合会超时/超限
+      const MAX = 100
+      for (;;) {
+        const res = await col.limit(MAX).get()
+        if (!res.data || res.data.length === 0) {
+          break
+        }
+        for (const doc of res.data) {
+          await col.doc(doc._id).remove()
+        }
+        if (res.data.length < MAX) {
+          break
+        }
+      }
       return { ok: true }
     }
     return { ok: false, error: '未知操作 ' + action }

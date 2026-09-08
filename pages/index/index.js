@@ -56,6 +56,8 @@ Page({
 
   onShow() {
     this.loadWedding()
+    // 每次回前台都重拉留言：后台管理端清空/新增后，留言展示区跟着变化
+    this.loadBlessings()
     // 从后台回前台：若正停在相册页，恢复胶片自动上滑
     if (this.data.current === 2 && !this.data.filmAutoplay) {
       this.setData({ filmAutoplay: true })
@@ -91,7 +93,7 @@ Page({
     this.startCountdown()
     // 打开即播背景音乐（个别机型拦截冷启动自动播放，见 onRootTouchStart 兜底）
     this.autoPlayMusic()
-    await this.loadBlessings()
+    // 留言加载统一走 onShow（冷启动也会触发 onShow），避免重复请求
   },
 
   async loadWedding() {
@@ -415,9 +417,18 @@ Page({
   },
 
   async loadBlessings() {
-    const blessings = await storage.loadBlessingsAsync()
-    this.setData({ blessingsLoading: false })
-    this.applyBlessings(blessings)
+    // 上一次还没回来就不再发起（onShow 可能连续触发），返回中的那次会覆盖最新数据
+    if (this._loadingBlessings) {
+      return
+    }
+    this._loadingBlessings = true
+    try {
+      const blessings = await storage.loadBlessingsAsync()
+      this.setData({ blessingsLoading: false })
+      this.applyBlessings(blessings)
+    } finally {
+      this._loadingBlessings = false
+    }
   },
 
   // 祝福墙：超过 3 条时固定高度并循环滚动，否则保持内容自适应

@@ -227,6 +227,38 @@ describe('pages/admin/guests 黑盒：名单增删改', () => {
     assert.equal(after.data.name, '改名')
   })
 
+  it('clearAll 确认后云端与本地宾客全部清空', async () => {
+    h.bootApp()
+    boot()
+    const db = h.state.db
+    await db.collection('guests').add({ data: { name: 'a', count: 2, status: 'confirmed', message: '', time: 't' } })
+    await db.collection('guests').add({ data: { name: 'b', count: 1, status: 'pending', message: '', time: 't' } })
+    await page.refresh()
+    assert.equal(page.data.guests.length, 2)
+    h.state.wx.__state.nextModalConfirm = true
+    page.clearAll()
+    await h.sleep(40)
+    const remain = await db.collection('guests').get()
+    assert.equal(remain.data.length, 0)
+    assert.equal(page.data.guests.length, 0)
+    assert.equal(page.data.totalCount, 0)
+    assert.ok(h.state.wx.__state.toasts.some((t) => t.title === '已清空云端'))
+  })
+
+  it('clearAll 取消则不动名单', async () => {
+    h.bootApp({ noCloud: true })
+    boot()
+    h.state.wx.setStorageSync('guest_list', [
+      { id: 1, name: '留下', count: 1, status: 'pending', message: '', time: 't' }
+    ])
+    await page.refresh()
+    h.state.wx.__state.nextModalConfirm = false
+    page.clearAll()
+    await h.sleep(20)
+    assert.ok(h.state.wx.__state.modals.some((m) => m.title === '确认清空全部宾客？'))
+    assert.equal(page.data.guests.length, 1)
+  })
+
   it('removeGuest 确认后删除云端与本机记录', async () => {
     h.bootApp()
     boot()
@@ -335,6 +367,22 @@ describe('pages/admin/blessings 黑盒：留言改删清空', () => {
     await h.sleep(40)
     const remain = await db.collection('blessings').get()
     assert.equal(remain.data.length, 0)
+  })
+
+  it('弹层「清空」按钮一键清空全部表单内容', async () => {
+    h.bootApp({ noCloud: true })
+    boot()
+    h.state.wx.setStorageSync('blessings', [
+      { id: 1, name: '甲', count: 2, message: '原文', time: '9月1日 10:00' }
+    ])
+    await page.refresh()
+    page.openEdit({ currentTarget: { dataset: { id: 1 } } })
+    page.onFormInput({ currentTarget: { dataset: { field: 'name' } }, detail: { value: '改过的名字' } })
+    page.clearForm()
+    assert.equal(page.data.form.name, '', '姓名应被清空')
+    assert.equal(page.data.form.count, '', '人数应被清空')
+    assert.equal(page.data.form.message, '', '留言内容应被清空')
+    assert.equal(page.data.form.time, '9月1日 10:00', '原提交时间保留供保存沿用')
   })
 
   it('clearAll 确认后云端清空且本地为空', async () => {

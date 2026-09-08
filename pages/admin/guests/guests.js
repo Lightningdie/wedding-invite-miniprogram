@@ -116,6 +116,26 @@ Page({
     })
   },
 
+  // 清空全部宾客：云端 + 本地一并清，防止下次拉取时复活
+  clearAll() {
+    wx.showModal({
+      title: '确认清空全部宾客？',
+      content: '清空后云端和本地都会删除，不可恢复',
+      success: async (res) => {
+        if (!res.confirm) {
+          return
+        }
+        const result = await storage.clearGuestsAsync()
+        this.setData({ guests: result.list, totalCount: 0 })
+        wx.showToast({
+          title: result.cloud ? '已清空云端' : '仅本地清空（云函数未部署或权限受限）',
+          icon: 'none',
+          duration: 2000
+        })
+      }
+    })
+  },
+
   removeGuest(e) {
     const id = e.currentTarget.dataset.id
     wx.showModal({

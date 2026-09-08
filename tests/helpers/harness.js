@@ -175,6 +175,8 @@ function launchIndexPage(opts) {
   bootApp({ noCloud: opts.noCloud })
   const page = loadPage('pages/index/index.js')
   page.onLoad()
+  // 真机 onLoad 后必触发 onShow（留言加载已统一挪到 onShow），测试保持同一时序
+  page.onShow()
   return page
 }
 

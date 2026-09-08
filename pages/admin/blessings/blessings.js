@@ -53,6 +53,19 @@ Page({
     })
   },
 
+  // 弹层「清空」：一键清空全部表单内容（姓名/人数/留言），
+  // time 保留——保存时仍沿用原留言的提交时间
+  clearForm() {
+    this.setData({
+      form: {
+        name: '',
+        count: '',
+        message: '',
+        time: this.data.form.time || ''
+      }
+    })
+  },
+
   async saveBlessing() {
     const form = this.data.form
     // 姓名和留言内容必填

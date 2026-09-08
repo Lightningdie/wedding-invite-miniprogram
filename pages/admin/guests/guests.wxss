@@ -17,8 +17,20 @@
   color: #8B7355;
 }
 
+.toolbar-actions {
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
+}
+
 .add-btn {
   background: #D4AF37 !important;
+  color: #fff !important;
+  border-radius: 30rpx;
+}
+
+.clear-btn {
+  background: #C07070 !important;
   color: #fff !important;
   border-radius: 30rpx;
 }

@@ -187,6 +187,68 @@ describe('utils/storage.js 白盒：云端链路与回退', () => {
     assert.deepEqual(storage.getBlessings(), [])
   })
 
+  it('云端清空标记比本机新：同步清空本地缓存并记住标记', async () => {
+    storage.setBlessings([
+      { id: 'c0000000000000000001', name: '本机留言', message: 'x', time: 't' }
+    ])
+    await h.state.db.collection('wedding_config').doc('blessings_cleared')
+      .set({ data: { clearedAt: Date.now() } })
+    const list = await storage.loadBlessingsAsync()
+    assert.deepEqual(list, [], '后台已清空应返回空列表')
+    assert.deepEqual(storage.getBlessings(), [], '本机缓存应一并清掉')
+    const marker = await h.state.db.collection('wedding_config').doc('blessings_cleared').get()
+    assert.equal(
+      h.state.wx.getStorageSync('blessing_cloud_cleared'),
+      marker.data.clearedAt,
+      '本机应记住云端清空事件时间'
+    )
+  })
+
+  it('clearBlessingsAsync 云端清空后本机标记与云端事件时间一致', async () => {
+    await h.state.db.collection('blessings').add({ data: { name: 'n', count: 1, message: 'm', time: 't' } })
+    const result = await storage.clearBlessingsAsync()
+    assert.equal(result.cloud, true)
+    const marker = await h.state.db.collection('wedding_config').doc('blessings_cleared').get()
+    assert.equal(h.state.wx.getStorageSync('blessing_cloud_cleared'), marker.data.clearedAt)
+    // 之后再拉取：标记与本机一致，不会误清也不会复活本地数据
+    const list = await storage.loadBlessingsAsync()
+    assert.deepEqual(list, [])
+  })
+
+  it('clearGuestsAsync 走云函数清空全部宾客', async () => {
+    const db = h.state.db
+    for (let i = 0; i < 3; i++) {
+      await db.collection('guests').add({
+        data: { name: '客' + i, count: 1, status: 'pending', message: '', time: 't' }
+      })
+    }
+    const result = await storage.clearGuestsAsync()
+    assert.equal(result.cloud, true)
+    assert.deepEqual(result.list, [])
+    const remain = await db.collection('guests').get()
+    assert.equal(remain.data.length, 0)
+    assert.deepEqual(storage.getGuests(), [])
+  })
+
+  it('clearGuestsAsync 云函数不可用时云端 id 全记墓碑', async () => {
+    const db = h.state.db
+    const ids = []
+    for (let i = 0; i < 2; i++) {
+      const r = await db.collection('guests').add({
+        data: { name: '客' + i, count: 1, status: 'pending', message: '', time: 't' }
+      })
+      ids.push(r._id)
+    }
+    storage.setGuests(ids.map((id) => ({ id: id, name: '客', count: 1, status: 'pending', message: '', time: 't' })))
+    global.wx.__state.cloudFunctions = {}
+    const result = await storage.clearGuestsAsync()
+    assert.equal(result.cloud, false)
+    const tombstones = h.state.wx.getStorageSync('guest_deleted_ids').map(String)
+    ids.forEach((id) => assert.ok(tombstones.indexOf(id) >= 0, '应记录墓碑 ' + id))
+    const list = await storage.loadGuestsAsync()
+    assert.equal(list.length, 0, '墓碑过滤后拉取应为空')
+  })
+
   it('云端非空列表正常覆盖本地', async () => {
     await h.state.db.collection('blessings').add({
       data: { name: '云端留言', count: '1', message: 'm', time: 't' }
