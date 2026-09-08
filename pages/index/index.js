@@ -30,6 +30,8 @@ Page({
     wedding: {},
     shareImage: '',
     musicOn: false,
+    // 音乐按钮 top 内联样式：与胶囊按钮对齐后由 JS 写入，px 精确适配刘海屏
+    musicBtnStyle: '',
     cloudTip: '',
     current: 0,
     // 竖向胶片：原生竖向 swiper 匀速连续上滑，触摸时暂停自动播放、松手后恢复
@@ -50,8 +52,24 @@ Page({
   _edges: {},
 
   onLoad() {
+    this.alignMusicBtn()
     this.bootstrap()
     this.enableShare()
+  },
+
+  // 音乐按钮与右上角胶囊按钮垂直居中对齐：iPhone 刘海/灵动岛的 safe-area
+  // 高度远大于安卓状态栏，纯 rpx + safe-area 定位会导致 iOS 上按钮明显偏低。
+  // 胶囊位置全平台一致，以其为锚点两端视觉统一；拿不到胶囊时保留 wxss 兜底。
+  alignMusicBtn() {
+    const rect = wx.getMenuButtonBoundingClientRect ? wx.getMenuButtonBoundingClientRect() : null
+    if (!rect || !rect.height) {
+      return
+    }
+    const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
+    // 按钮尺寸 64rpx，与 wxml/wxss 保持一致
+    const btnPx = (64 / 750) * win.windowWidth
+    const top = rect.top + (rect.height - btnPx) / 2
+    this.setData({ musicBtnStyle: 'top: ' + Math.round(top) + 'px' })
   },
 
   onShow() {

@@ -56,7 +56,7 @@ const DEFAULT_WEDDING = {
   ],
   timeline: [
     { time: '08:00', en: 'Guest Arrival', icon: '/assets/images/icons/icon-arrival.png', title: '迎宾签到', desc: '欢迎各位来宾莅临，签到留影' },
-    { time: '08:30', en: 'Ceremony', icon: '/assets/images/icons/icon-ceremony.png', title: '婚礼典礼', desc: '新人入场，交换戒指，庄严宣誓' },
+    { time: '09:00', en: 'Ceremony', icon: '/assets/images/icons/icon-ceremony.png', title: '婚礼典礼', desc: '新人入场，交换戒指，庄严宣誓' },
     { time: '09:30', en: 'Photos', icon: '/assets/images/icons/icon-photos.png', title: '合影留念', desc: '与新人合影，记录美好瞬间' },
     { time: '10:00', en: 'Banquet', icon: '/assets/images/icons/icon-banquet.png', title: '喜宴开席', desc: '美酒佳肴，共庆美好时刻' }
   ],

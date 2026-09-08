@@ -3,7 +3,7 @@
 <!-- 根节点监听首次触摸：冷启动被拦的背景音乐在此补播 -->
 <view class="invite" bindtouchstart="onRootTouchStart">
 
-  <view class="music-btn {{musicOn ? 'music-on' : ''}}" bindtap="onToggleMusic">
+  <view class="music-btn {{musicOn ? 'music-on' : ''}}" style="{{musicBtnStyle}}" bindtap="onToggleMusic">
     <image class="music-icon" src="/assets/images/music-note.png"></image>
     <view class="music-slash" wx:if="{{!musicOn}}"></view>
   </view>
