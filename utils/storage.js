@@ -128,21 +128,10 @@ function mergeWedding(saved) {
   merged.inviteFiller = useArrayOr(merged.inviteFiller, DEFAULT_WEDDING.inviteFiller)
   merged.stories = useArrayOr(merged.stories, DEFAULT_WEDDING.stories)
   merged.transportTips = useArrayOr(merged.transportTips, DEFAULT_WEDDING.transportTips)
-  merged.photos = useArrayOr(merged.photos, DEFAULT_WEDDING.photos.map((p) => ({ ...p })))
   merged.timeline = useArrayOr(merged.timeline, DEFAULT_WEDDING.timeline.map((t) => ({ ...t })))
-  // 照片逐张校验：先迁移 cloud://，无效地址按同序号默认照片回填，越界的无效条目丢弃
-  if (Array.isArray(merged.photos)) {
-    merged.photos = merged.photos
-      .map((p, i) => {
-        const fallback = DEFAULT_WEDDING.photos[i]
-        const src = p && migrateMediaSrc(p.src)
-        if (!p || typeof p !== 'object' || !isValidMediaSrc(src)) {
-          return fallback ? { ...fallback, ...(p || {}), src: fallback.src } : null
-        }
-        return { ...p, src }
-      })
-      .filter(Boolean)
-  }
+  // 相册没有后台编辑入口，始终以 data/wedding.js 默认清单为准（换照片：改默认值 + 传静态托管）。
+  // 本地缓存/云数据库里的 photos 是历史整份保存留下的旧副本，采用会导致「改了默认相册不生效」
+  merged.photos = DEFAULT_WEDDING.photos.map((p) => ({ ...p }))
   // 旧配置的流程条目没有英文名（en）和图标（icon），按序号回填默认值，保证左右分栏排版完整
   if (Array.isArray(merged.timeline)) {
     merged.timeline = merged.timeline.map((item, i) => {
@@ -272,18 +261,27 @@ async function loadWeddingAsync() {
   if (!db) {
     return local
   }
+  // 配置固定存在 _id=main 的文档里；无序 limit(1) 在集合里出现多条文档时可能读到旧文档
+  let doc = null
   try {
-    // 空集合时 doc('main').get() 会抛「cannot find document」错误，改用查询：无记录返回空数组
-    const res = await db.collection('wedding_config').limit(1).get()
-    const doc = res && res.data && res.data[0]
-    if (doc) {
-      const merged = mergeWedding(doc)
-      delete merged._id
-      setWeddingLocal(merged)
-      return merged
-    }
+    const res = await db.collection('wedding_config').doc(DOC_WEDDING_ID).get()
+    doc = res && res.data
   } catch (e) {
-    console.log('云端婚礼配置读取失败，使用本地', e)
+    // main 不存在（空集合或历史数据用了别的 _id）：按更新时间取最新一条兜底，空结果不算错误
+    try {
+      const res = await db.collection('wedding_config').orderBy('updatedAt', 'desc').limit(1).get()
+      doc = res && res.data && res.data[0]
+    } catch (e2) {
+      console.log('云端婚礼配置读取失败，使用本地', e2)
+    }
+  }
+  if (doc) {
+    const merged = mergeWedding(doc)
+    delete merged._id
+    setWeddingLocal(merged)
+    // 打印实际生效的配置来源与照片数，排查「数据库改了但页面没变」时一眼可辨
+    console.log('使用云端婚礼配置', doc._id || DOC_WEDDING_ID, '照片', merged.photos.length, '张')
+    return merged
   }
   return local
 }

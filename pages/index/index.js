@@ -116,6 +116,11 @@ Page({
 
   async loadWedding() {
     const wedding = await storage.loadWeddingAsync()
+    // 照片同名替换后微信本地缓存可能仍返回旧图：URL 追加会话级版本参数强制取新
+    const ver = this._mediaVer || (this._mediaVer = Date.now())
+    wedding.photos = (wedding.photos || []).map((p) =>
+      p && p.src && String(p.src).indexOf('?') < 0 ? { ...p, src: p.src + '?v=' + ver } : p
+    )
     this.setData({ wedding })
     // 兜底：万一配置里仍残留 cloud:// 云存储地址，统一换成 https 临时链接
     // （正常情况媒体走静态托管公网地址，此处直接跳过）

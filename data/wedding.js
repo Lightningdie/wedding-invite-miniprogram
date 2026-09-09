@@ -70,8 +70,7 @@ const DEFAULT_WEDDING = {
     { src: cdn('images/photoes/7.jpg'), title: '心动时刻', desc: '每个瞬间都值得珍藏' },
     { src: cdn('images/photoes/8.jpg'), title: '爱的旅程', desc: '往后余生，请多指教' },
     { src: cdn('images/photoes/9.jpg'), title: '佳偶天成', desc: '最美的祝福，是您的见证' },
-    { src: cdn('images/photoes/10.jpg'), title: '喜结良缘', desc: '愿所有美好都如约而至' },
-    { src: cdn('images/photoes/11.jpg'), title: '共赴喜宴', desc: '九月二十九，恭候您的光临' }
+    { src: cdn('images/photoes/10.jpg'), title: '喜结良缘', desc: '愿所有美好都如约而至' }
   ],
   stories: [
     {
