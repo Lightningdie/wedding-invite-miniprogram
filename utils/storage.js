@@ -8,6 +8,8 @@ const { DEFAULT_WEDDING } = require('../data/wedding.js')
 const KEY_WEDDING = 'wedding_config'
 const KEY_BLESSINGS = 'blessings'
 const KEY_GUESTS = 'guest_list'
+// 记录上次启动时的小程序版本号，用于版本变更时清理本地存档
+const KEY_VERSION = 'app_version'
 // 已删除宾客 id 墓碑：云端记录受「仅创建者可读写」权限限制删不掉时，防止下次从云端拉取时复活
 const KEY_GUEST_DELETED = 'guest_deleted_ids'
 // 已删除留言 id 墓碑：同上，留言管理页删除失败时本机保持隐藏
@@ -64,6 +66,32 @@ function initCloud() {
 
 function isCloudReady() {
   return cloudReady
+}
+
+// 版本变更即清本地缓存：取线上小程序版本号与上次启动时对比，发布新版后首次
+// 打开时清掉本地存档（婚礼配置/留言/名单），避免旧配置盖住新版的默认内容；
+// 同版本内不清，保留留言等数据的离线兜底。开发/体验版无版本号，按环境标识区分。
+function initVersionedCache() {
+  let ver = ''
+  try {
+    const info = wx.getAccountInfoSync ? wx.getAccountInfoSync() : null
+    ver =
+      (info && info.miniProgram && (info.miniProgram.version || info.miniProgram.envVersion)) || ''
+  } catch (e) {
+    ver = ''
+  }
+  try {
+    const saved = wx.getStorageSync(KEY_VERSION)
+    if (saved !== ver) {
+      wx.removeStorageSync(KEY_WEDDING)
+      wx.removeStorageSync(KEY_BLESSINGS)
+      wx.removeStorageSync(KEY_GUESTS)
+      wx.setStorageSync(KEY_VERSION, ver)
+      console.log('小程序版本变更，本地缓存已清理', saved || '(首次打开)', '->', ver || '(开发版)')
+    }
+  } catch (e) {
+    console.log('版本缓存清理失败（不影响启动）', e)
+  }
 }
 
 function getDb() {
@@ -778,6 +806,7 @@ async function clearBlessingsAsync() {
 
 module.exports = {
   initCloud,
+  initVersionedCache,
   isCloudReady,
   getWedding,
   setWedding,

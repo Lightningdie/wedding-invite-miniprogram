@@ -104,14 +104,30 @@ Page({
     if (this._filmTimer) {
       clearTimeout(this._filmTimer)
     }
+    if (this._musicTimer) {
+      clearTimeout(this._musicTimer)
+    }
   },
 
-  async bootstrap() {
-    await this.loadWedding()
+  bootstrap() {
     this.startCountdown()
-    // 打开即播背景音乐（个别机型拦截冷启动自动播放，见 onRootTouchStart 兜底）
-    this.autoPlayMusic()
-    // 留言加载统一走 onShow（冷启动也会触发 onShow），避免重复请求
+    // 数据（婚礼配置/留言）由 onShow 在打开第一时间并行请求，这里不做重复请求；
+    // 背景音乐延后 5 秒再播：给首屏资源请求让路，也避开冷启动音频拦截高峰
+    // （个别机型拦截自动播放，见 onRootTouchStart 兜底）
+    this.scheduleMusic()
+  },
+
+  // 打开 5 秒后自动播背景音乐；期间用户手动点过音乐按钮则以用户操作为准
+  scheduleMusic() {
+    if (this._musicTimer) {
+      clearTimeout(this._musicTimer)
+    }
+    this._musicTimer = setTimeout(() => {
+      this._musicTimer = null
+      if (!this._musicManualToggle) {
+        this.autoPlayMusic()
+      }
+    }, 5000)
   },
 
   async loadWedding() {
@@ -527,6 +543,8 @@ Page({
   },
 
   onToggleMusic() {
+    // 用户主动碰过音乐按钮后，取消 5 秒后的自动播放安排，以用户操作为准
+    this._musicManualToggle = true
     // 后台入口暗门：3 秒内连点 5 次进入管理页，替代长按，避免宾客误触
     const now = Date.now()
     this._musicTaps = (this._musicTaps || []).filter((t) => now - t < 3000)
